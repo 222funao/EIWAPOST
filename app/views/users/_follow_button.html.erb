@@ -7,6 +7,7 @@
     <% follows_you  = user.following?(current_user) %>
 
     <% if is_following %>
+      <%= button_to user_unfollow_path(user, format: :turbo_stream),
       <%= button_to user_unfollow_path(user),
         method: :delete,
         form: { data: { turbo: true, turbo_stream: true } },
@@ -15,6 +16,7 @@
         <%= is_friends ? "Amigos" : "Siguiendo" %>
       <% end %>
     <% else %>
+      <%= button_to user_follow_path(user, format: :turbo_stream),
       <%= button_to user_follow_path(user),
         method: :post,
         form: { data: { turbo: true, turbo_stream: true } },
