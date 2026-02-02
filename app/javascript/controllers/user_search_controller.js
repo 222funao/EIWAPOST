@@ -146,11 +146,18 @@ export default class extends Controller {
         method,
         headers: {
           "X-CSRF-Token": token,
-          Accept: "application/json"
+          Accept: "application/json",
+          "X-Requested-With": "XMLHttpRequest"
         }
       })
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+      const contentType = res.headers.get("content-type") || ""
+      if (!contentType.includes("application/json")) {
+        await this.fetchResults(this.inputTarget.value.trim())
+        return
+      }
 
       const data = await res.json()
       const followed = !!data.followed
