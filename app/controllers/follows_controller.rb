@@ -6,11 +6,8 @@ class FollowsController < ApplicationController
     return head :unprocessable_entity if @user == current_user
 
     Follow.find_or_create_by!(follower: current_user, followed: @user)
-    @user.reload
-    current_user.reload
     respond_to do |format|
       format.turbo_stream
-      format.html { render :create, formats: :turbo_stream }
       format.json do
         render json: {
           followed: true,
@@ -23,11 +20,8 @@ class FollowsController < ApplicationController
 
   def destroy
     Follow.where(follower: current_user, followed: @user).destroy_all
-    @user.reload
-    current_user.reload
     respond_to do |format|
       format.turbo_stream
-      format.html { render :destroy, formats: :turbo_stream }
       format.json do
         render json: {
           followed: false,
