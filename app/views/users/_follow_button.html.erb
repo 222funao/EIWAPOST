@@ -4,11 +4,12 @@
   <% else %>
     <% is_following = current_user.following?(user) %>
     <% is_friends   = current_user.friends_with?(user) %>
+    <% follows_you  = user.following?(current_user) %>
 
     <% if is_following %>
       <%= button_to user_unfollow_path(user),
         method: :delete,
-        form: { data: { turbo: true } },
+        form: { data: { turbo: true, turbo_stream: true } },
         class: "rounded-lg px-3 py-1.5 text-xs font-semibold
                 #{is_friends ? "bg-emerald-500/15 text-emerald-200 hover:bg-emerald-500/25" : "bg-white/10 text-zinc-200 hover:bg-white/15"}" do %>
         <%= is_friends ? "Amigos" : "Siguiendo" %>
@@ -16,9 +17,9 @@
     <% else %>
       <%= button_to user_follow_path(user),
         method: :post,
-        form: { data: { turbo: true } },
+        form: { data: { turbo: true, turbo_stream: true } },
         class: "rounded-lg bg-sky-500/20 px-3 py-1.5 text-xs font-semibold text-sky-200 hover:bg-sky-500/30" do %>
-        Seguir
+        <%= follows_you ? "Seguir también" : "Seguir" %>
       <% end %>
     <% end %>
   <% end %>
