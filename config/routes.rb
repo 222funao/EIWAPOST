@@ -7,18 +7,12 @@ Rails.application.routes.draw do
 
   # (opcional) si no usas edit propio, bórralo:
   # get "/profile/edit", to: "profiles#edit", as: :edit_profile
- # ✅ búsqueda de usuarios (Turbo Frame)
+  # ✅ búsqueda de usuarios (Turbo Frame)
   get "/search/users", to: "users#search", as: :search_users
 
   # ✅ seguir / dejar de seguir (por id)
   post   "/users/:id/follow", to: "follows#create",  as: :user_follow
   delete "/users/:id/follow", to: "follows#destroy", as: :user_unfollow
-resources :users, only: [] do
-  resource :follow, only: [:create, :destroy]
-end
-namespace :search do
-  resources :users, only: [:index]
-end
 
   resources :posts, only: [:new, :create] do
     resources :comments, only: [:create, :destroy]
