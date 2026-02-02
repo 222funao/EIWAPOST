@@ -1,30 +1,13 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
 
-def users
-  q = params[:q].to_s.strip
-
-  users = User.where("username ILIKE ?", "%#{q}%").limit(20)
-
-  render json: users.map { |u|
-    {
-      id: u.id,
-      username: u.username,
-      profile_url: public_profile_path(u),
-      avatar_url: (u.avatar.attached? ? url_for(u.avatar) : ActionController::Base.helpers.asset_path("avatars/default.png")),
-      followed: current_user.following?(u)
-      follow_url: user_follow_path(u)
-    }
-  }
-end
-
   def search
     q = params[:q].to_s.strip
 
     users =
       if q.present?
         User
-          .where("username ILIKE ?", "%#{q}%")
+          .where("username ILIKE ? OR email ILIKE ?", "%#{q}%", "%#{q}%")
           .where.not(id: current_user.id)
           .order(:username)
           .limit(20)
@@ -32,12 +15,20 @@ end
         User.none
       end
 
+    followed_ids =
+      if users.any?
+        Follow.where(follower_id: current_user.id, followed_id: users.select(:id)).pluck(:followed_id)
+      else
+        []
+      end
+
     render json: users.map { |u|
       {
         id: u.id,
         username: u.username,
         avatar_url: avatar_path_for(u),
-        profile_url: public_profile_path(u.id)
+        profile_url: public_profile_path(u),
+        followed: followed_ids.include?(u.id)
       }
     }
   end
