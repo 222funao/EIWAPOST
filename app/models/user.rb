@@ -59,7 +59,7 @@ end
   has_many :followers, through: :passive_follows, source: :follower
 
   def following?(user)
-    active_follows.exists?(followed_id: user.id)
+    Follow.exists?(follower_id: id, followed_id: user.id)
   end
 
   # “Amigos” = se siguen ambos
