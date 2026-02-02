@@ -1,0 +1,57 @@
+<%= render "devise/shared/auth_shell" do %>
+  <h1 class="text-2xl font-semibold tracking-tight">Iniciar sesión</h1>
+  <p class="mt-2 text-sm text-zinc-400">Entra con tu nombre de usuario y contraseña.</p>
+
+  <% if flash.alert.present? %>
+    <div class="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
+      <%= flash.alert %>
+    </div>
+  <% end %>
+
+  <% if flash.notice.present? %>
+    <div class="mt-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-200">
+      <%= flash.notice %>
+    </div>
+  <% end %>
+
+  <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "mt-6 space-y-4" }) do |f| %>
+
+    <div>
+      <%= f.label :login, "Nombre de usuario", class: "mb-2 block text-sm text-zinc-300" %>
+      <%= f.text_field :login,
+        autofocus: true,
+        autocomplete: "username",
+        class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10",
+        placeholder: "tu_usuario" %>
+    </div>
+
+    <div>
+      <%= f.label :password, "Contraseña", class: "mb-2 block text-sm text-zinc-300" %>
+      <%= f.password_field :password,
+        autocomplete: "current-password",
+        class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10",
+        placeholder: "••••••••" %>
+    </div>
+
+    <div class="flex items-center justify-between">
+      <% if devise_mapping.rememberable? %>
+        <label class="flex items-center gap-2 text-sm text-zinc-400">
+          <%= f.check_box :remember_me, class: "h-4 w-4 rounded border-white/10 bg-zinc-950/40" %>
+          Recuérdame
+        </label>
+      <% end %>
+
+      <%= link_to "¿Olvidaste tu contraseña?", new_password_path(resource_name),
+        class: "text-sm text-zinc-300 hover:text-white" %>
+    </div>
+
+    <%= f.submit "Iniciar sesión",
+      class: "mt-2 w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 active:scale-[0.99]" %>
+  <% end %>
+
+  <div class="mt-6 text-center text-sm text-zinc-400">
+    ¿No tienes cuenta?
+    <%= link_to "Crear cuenta", new_registration_path(resource_name),
+      class: "font-semibold text-white hover:underline" %>
+  </div>
+<% end %>

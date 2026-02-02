@@ -1,0 +1,60 @@
+<%= render "devise/shared/auth_shell" do %>
+  <h1 class="text-2xl font-semibold tracking-tight">Crear cuenta</h1>
+  <p class="mt-2 text-sm text-zinc-400">Únete a EIWAPOST en segundos.</p>
+
+  <% if resource.errors.any? %>
+    <div class="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
+      <div class="font-semibold">Revisa esto:</div>
+      <ul class="mt-2 list-disc space-y-1 pl-5">
+        <% resource.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "mt-6 space-y-4" }) do |f| %>
+
+    <div>
+      <%= f.label :username, "Nombre de usuario", class: "mb-2 block text-sm text-zinc-300" %>
+      <%= f.text_field :username,
+        autofocus: true,
+        autocomplete: "username",
+        class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10",
+        placeholder: "eiwa_user" %>
+    </div>
+
+    <div>
+      <%= f.label :email, "Correo electrónico", class: "mb-2 block text-sm text-zinc-300" %>
+      <%= f.email_field :email,
+        autocomplete: "email",
+        class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10",
+        placeholder: "tucorreo@email.com" %>
+    </div>
+
+    <div>
+      <%= f.label :password, "Contraseña", class: "mb-2 block text-sm text-zinc-300" %>
+      <%= f.password_field :password,
+        autocomplete: "new-password",
+        class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10",
+        placeholder: "mínimo 6 caracteres" %>
+    </div>
+
+    <div>
+      <%= f.label :password_confirmation, "Confirmar contraseña", class: "mb-2 block text-sm text-zinc-300" %>
+      <%= f.password_field :password_confirmation,
+        autocomplete: "new-password",
+        class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10",
+        placeholder: "repite la contraseña" %>
+    </div>
+
+    <%= f.submit "Crear cuenta",
+      class: "mt-2 w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 active:scale-[0.99]" %>
+  <% end %>
+
+  <div class="mt-6 text-center text-sm text-zinc-400">
+    ¿Ya tienes cuenta?
+    <%= link_to "Inicia sesión", new_session_path(resource_name),
+      class: "font-semibold text-white hover:underline" %>
+  </div>
+<% end %>

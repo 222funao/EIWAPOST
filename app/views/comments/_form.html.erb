@@ -1,0 +1,10 @@
+<div id="comment_form_post_<%= post.id %>">
+  <%= form_with model: [post, comment], class: "flex items-center gap-2" do |f| %>
+    <%= f.text_field :body,
+      placeholder: "Escribe un comentario...",
+      class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+
+    <%= f.submit "Enviar",
+      class: "rounded-xl bg-white px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 active:scale-[0.99]" %>
+  <% end %>
+</div>

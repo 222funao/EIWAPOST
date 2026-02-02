@@ -1,0 +1,147 @@
+<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+  <div class="w-full px-0">
+    <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_1fr]">
+
+      <!-- Sidebar: usa el MISMO partial/código que en index -->
+      <%= render "shared/sidebar" %>
+
+      <!-- Main -->
+      <main class="py-8 px-6 lg:px-10">
+        <div class="mx-auto w-full max-w-[980px]">
+
+          <!-- HEADER PERFIL -->
+          <div class="flex flex-col gap-6 md:flex-row md:items-center">
+
+            <!-- Avatar clickeable -->
+            <div data-controller="avatar-picker" class="shrink-0">
+              <%= form_with model: current_user, url: profile_path, method: :patch,
+                    html: { multipart: true, class: "inline" } do |f| %>
+
+                <%= f.file_field :avatar,
+                  class: "hidden",
+                  data: { avatar_picker_target: "input", action: "change->avatar-picker#submit" } %>
+
+                <button type="button"
+                  data-action="click->avatar-picker#pick"
+                  class="relative h-28 w-28 rounded-full bg-zinc-800 overflow-hidden ring-2 ring-white/10 hover:ring-white/20 transition">
+                  <% if current_user.avatar.attached? %>
+                    <%= image_tag current_user.avatar, class: "h-full w-full object-cover" %>
+                  <% else %>
+                    <%= image_tag "avatars/default.png", class: "h-full w-full object-cover opacity-90" %>
+                  <% end %>
+
+                  <!-- iconito tipo IG -->
+                  <div class="absolute inset-0 grid place-items-center bg-black/0 hover:bg-black/35 transition">
+                    <div class="rounded-full bg-black/55 px-3 py-2 text-sm text-white opacity-0 hover:opacity-100 transition">
+                      📷 Cambiar
+                    </div>
+                  </div>
+                </button>
+
+              <% end %>
+            </div>
+
+            <!-- Info derecha -->
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center gap-3">
+                <div class="text-xl font-semibold"><%= current_user.username %></div>
+
+                <%= link_to "Editar perfil",
+                  edit_user_registration_path,
+                  class: "rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-zinc-100
+                          hover:bg-white/10 active:scale-[0.99] transition" %>
+              </div>
+
+              <!-- Stats -->
+              <div class="mt-4 flex gap-6 text-sm">
+                <div><span class="font-semibold"><%= @posts.size %></span> publicaciones</div>
+                <div><span class="font-semibold">0</span> seguidores</div>
+                <div><span class="font-semibold">0</span> seguidos</div>
+              </div>
+
+              <!-- Bio editable -->
+              <div class="mt-4 max-w-[520px]">
+                <%= form_with model: current_user, url: profile_path, method: :patch do |f| %>
+                  <div class="flex flex-col gap-2">
+                    <%= f.text_area :bio,
+                      rows: 3,
+                      placeholder: "Escribe tu biografía…",
+                      class: "w-full resize-none rounded-2xl border border-white/10 bg-zinc-900/30 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+
+                    <div class="flex items-center gap-2">
+                      <%= f.submit "Guardar",
+                        class: "rounded-xl bg-white px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 active:scale-[0.99]" %>
+
+                      <% if flash[:notice].present? %>
+                        <div class="text-xs text-zinc-400"><%= flash[:notice] %></div>
+                      <% end %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- TABS -->
+          <div data-controller="profile-tabs" class="mt-10">
+            <div class="flex items-center justify-center gap-10 border-t border-white/10 pt-4 text-sm">
+              <button type="button"
+                data-action="click->profile-tabs#showPosts"
+                data-profile-tabs-target="tabPosts"
+                class="flex items-center gap-2 text-zinc-200">
+                ⬛ Publicaciones
+              </button>
+
+              <button type="button"
+                data-action="click->profile-tabs#showLiked"
+                data-profile-tabs-target="tabLiked"
+                class="flex items-center gap-2 text-zinc-500 hover:text-zinc-200">
+                ❤️ Likeadas
+              </button>
+            </div>
+
+            <!-- GRID POSTS (2 columnas) -->
+            <!-- GRID POSTS -->
+<section
+  data-profile-tabs-target="panelPosts"
+  class="mt-6 transition-all duration-300 ease-out opacity-100 translate-y-0"
+>
+  <% if @posts.any? %>
+    <div class="grid grid-cols-2 gap-3">
+      <% @posts.each do |post| %>
+        <%= render "profiles/post_tile", post: post %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mt-12 text-center text-zinc-400">
+      Aún no has publicado nada.
+    </div>
+  <% end %>
+</section>
+
+<!-- GRID LIKEADAS -->
+<section
+  data-profile-tabs-target="panelLiked"
+  class="mt-6 transition-all duration-300 ease-out opacity-0 translate-y-2 pointer-events-none absolute -left-[99999px]"
+>
+  <% if @liked_posts.any? %>
+    <div class="grid grid-cols-2 gap-3">
+      <% @liked_posts.each do |post| %>
+        <%= render "profiles/post_tile", post: post %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mt-12 text-center text-zinc-400">
+      Aún no has dado like a ninguna publicación.
+    </div>
+  <% end %>
+</section>
+
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+</div>

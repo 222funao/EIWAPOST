@@ -1,0 +1,32 @@
+<% if q.present? && users.any? %>
+  <div class="space-y-1">
+    <% users.each do |u| %>
+      <div class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 hover:bg-white/5">
+        <%= link_to public_profile_path(u), class: "flex items-center gap-3 min-w-0" do %>
+          <div class="h-10 w-10 rounded-full bg-zinc-800 overflow-hidden shrink-0">
+            <% if u.avatar.attached? %>
+              <%= image_tag u.avatar, class: "h-full w-full object-cover" %>
+            <% else %>
+              <%= image_tag "avatars/default.png", class: "h-full w-full object-cover opacity-90" %>
+            <% end %>
+          </div>
+
+          <div class="min-w-0">
+            <div class="text-sm font-semibold text-zinc-100 truncate"><%= u.username %></div>
+            <div class="text-xs text-zinc-500 truncate">Perfil</div>
+          </div>
+        <% end %>
+
+        <%= render "users/follow_button", user: u %>
+      </div>
+    <% end %>
+  </div>
+<% elsif q.present? %>
+  <div class="px-6 py-10 text-center text-sm text-zinc-500">
+    No se encontraron usuarios.
+  </div>
+<% else %>
+  <div class="px-6 py-10 text-center text-sm text-zinc-500">
+    No hay búsquedas recientes.
+  </div>
+<% end %>

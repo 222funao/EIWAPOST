@@ -1,0 +1,397 @@
+<div data-controller="user-search" class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+  <div class="w-full pr-6 lg:pr-12 2xl:pr-6 pl-0">
+
+    <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_1fr_340px]">
+
+       <%= render "shared/sidebar" %>
+
+      <!-- Centro: Historias + Posts -->
+      <main class="py-6 pl-10 pr-10 lg:pl-29 lg:pr-4">
+
+
+        <!-- Historias -->
+        <section class="rounded-2xl border border-white/10 bg-zinc-900/30 p-4 mx-auto w-full max-w-[690px]">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-zinc-200">Historias</h2>
+            <button class="text-xs text-zinc-400 hover:text-white">Ver todo</button>
+          </div>
+
+          <div class="mt-4 flex gap-4 overflow-x-auto pb-2">
+            <% 10.times do |i| %>
+              <div class="flex w-20 flex-col items-center gap-2">
+                <div class="rounded-full bg-gradient-to-tr from-fuchsia-500 via-rose-500 to-amber-400 p-[2px]">
+                  <div class="h-16 w-16 rounded-full bg-zinc-950 p-[2px]">
+                    <div class="h-full w-full rounded-full bg-zinc-800"></div>
+                  </div>
+                </div>
+                <div class="w-full truncate text-center text-xs text-zinc-300">usuario_<%= i+1 %></div>
+              </div>
+            <% end %>
+          </div>
+        </section>
+
+<!-- Posts -->
+<section class="mt-6 space-y-6 mx-auto w-full max-w-[920px]">
+  <% @posts.each do |post| %>
+
+    <!-- Contenedor: post + panel comentarios -->
+    <div data-controller="post-comments"
+     class="relative lg:flex lg:items-stretch lg:justify-center">
+
+      <!-- Post (ancho fijo, no se encoge) -->
+      <div data-post-comments-target="post" class="lg:w-[520px] lg:shrink-0 transition-transform duration-300 ease-out">
+        <article class="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/30">
+          <div class="flex items-center justify-between px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="h-9 w-9 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+  <% if post.user.avatar.attached? %>
+    <%= image_tag post.user.avatar, class: "h-full w-full object-cover" %>
+  <% else %>
+    <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
+  <% end %>
+</div>
+
+
+              <div>
+                <div class="text-base font-semibold"><%= link_to post.user.username,
+            public_profile_path(post.user),
+            class: "hover:underline" %></div>
+                <div class="text-xs text-zinc-400"><%= time_ago_in_words(post.created_at) %> back</div>
+              </div>
+            </div>
+            <button class="rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white">⋯</button>
+          </div>
+
+          <!-- Media -->
+          <% if post.media.attached? %>
+            <% if post.media.count == 1 %>
+              <% file = post.media.first %>
+
+              <div class="relative w-full overflow-hidden bg-black aspect-[6/7]">
+                <% if file.content_type.start_with?("image/") %>
+                  <%= image_tag file, class: "absolute inset-0 h-full w-full object-cover" %>
+                <% else %>
+                  <div class="video-wrapper absolute inset-0">
+                    <%= video_tag url_for(file),
+                      class: "h-full w-full object-cover",
+                      autoplay: true,
+                      loop: true,
+                      muted: true,
+                      playsinline: true,
+                      data: { video: true } %>
+
+                    <button type="button"
+                      class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/50 px-3 py-2 text-white hover:bg-black/70">
+                      🔇
+                    </button>
+                  </div>
+                <% end %>
+              </div>
+
+            <% else %>
+              <!-- Carrusel -->
+              <div data-controller="carousel" class="relative group">
+                <div data-carousel-target="track" class="flex w-full overflow-hidden scroll-smooth">
+                  <% post.media.each do |file| %>
+                    <div class="w-full shrink-0" data-slide>
+                      <div class="relative w-full overflow-hidden bg-black aspect-[6/7]">
+                        <% if file.content_type.start_with?("image/") %>
+                          <%= image_tag file, class: "absolute inset-0 h-full w-full object-cover" %>
+                        <% else %>
+                          <div class="video-wrapper absolute inset-0">
+                            <%= video_tag url_for(file),
+                              class: "h-full w-full object-cover",
+                              autoplay: true,
+                              loop: true,
+                              muted: true,
+                              playsinline: true,
+                              data: { video: true } %>
+
+                            <button type="button"
+                              class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/50 px-3 py-2 text-white hover:bg-black/70">
+                              🔇
+                            </button>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+
+                <!-- Botones carrusel -->
+                <button type="button"
+                  data-action="click->carousel#prev"
+                  class="carousel-btn absolute left-3 top-1/2 z-10 -translate-y-1/2
+                        flex h-9 w-9 items-center justify-center
+                        rounded-full bg-black/50 text-white shadow-lg
+                        backdrop-blur
+                        transition-all duration-200 ease-out hover:scale-105 hover:bg-zinc-600/90 active:scale-95
+                        opacity-0 group-hover:opacity-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                <button type="button"
+                  data-action="click->carousel#next"
+                  class="carousel-btn absolute right-3 top-1/2 z-10 -translate-y-1/2
+                        flex h-9 w-9 items-center justify-center
+                        rounded-full bg-black/50 text-white shadow-lg
+                        backdrop-blur
+                        transition-all duration-200 ease-out hover:scale-105 hover:bg-zinc-600/90 active:scale-95
+                        opacity-0 group-hover:opacity-100">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+
+                <!-- Dots -->
+                <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+                  <% post.media.count.times do |i| %>
+                    <button type="button"
+                      data-carousel-target="dot"
+                      data-action="click->carousel#go"
+                      data-carousel-index-param="<%= i %>"
+                      class="h-2 w-2 rounded-full bg-white opacity-40">
+                    </button>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+
+          <!-- Caption + acciones -->
+          <div class="px-4 py-3">
+            <% if post.caption.present? %>
+              <div class="text-base text-zinc-200">
+                <span class="font-semibold"><%= link_to post.user.username,
+            public_profile_path(post.user),
+            class: "hover:underline" %></span>
+                <%= post.caption %>
+              </div>
+            <% end %>
+
+            <!-- Botón comentarios -->
+
+
+<div class="mt-3 flex items-center gap-3">
+  <%= render "posts/like_button", post: post %>
+
+
+<% base = "hover:scale-[1.05] active:scale-[0.95] inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-lg leading-none hover:bg-white/10 transition text-zinc-300 hover:text-white" %>
+
+<button type="button"
+  data-action="click->post-comments#toggle"
+  class="<%= base %>">
+
+  <span class="leading-none">💬</span>
+
+  <span
+    id="comments_count_post_<%= post.id %>"
+    class="text-sm leading-none">
+    <%= post.comments_count || post.comments.size %>
+  </span>
+
+</button>
+
+
+
+
+          </div>
+        </article>
+      </div>
+
+      <!-- Panel comentarios (derecha) -->
+      <aside
+  data-post-comments-target="panel"
+  class="hidden lg:flex lg:flex-col
+         absolute top-0 right-0 h-full
+         overflow-hidden rounded-2xl border bg-zinc-900/30
+         transition-all duration-300 ease-out
+         lg:w-0 lg:opacity-0 lg:border-transparent
+         pointer-events-none">
+
+
+        <div class="flex items-center justify-between px-4 py-3">
+          <div class="text-sm font-semibold text-zinc-200">Comentarios</div>
+          <button type="button"
+            data-action="click->post-comments#toggle"
+            class="rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white">✕</button>
+        </div>
+
+        <!-- lista comentarios -->
+        <div class="comments-scroll flex-1 min-h-0 px-4 pb-3 overflow-y-auto">
+
+          <div id="comments_list_post_<%= post.id %>" class="space-y-2 pr-1">
+            <% post.comments.order(created_at: :asc).each do |comment| %>
+              <div id="<%= dom_id(comment) %>" class="flex items-start justify-between gap-3 py-2">
+                <div class="min-w-0">
+                  <div class="text-sm">
+                    <span class="font-semibold text-zinc-200"><%= link_to comment.user.username,
+  public_profile_path(comment.user),
+  class: "font-semibold text-zinc-200 hover:underline" %></span>
+                    <span class="text-zinc-300 break-words"><%= comment.body %></span>
+                  </div>
+                  <div class="mt-1 text-xs text-zinc-500"><%= time_ago_in_words(comment.created_at) if comment.created_at %> back
+</div>
+                </div>
+
+                <% if comment.user_id == current_user.id %>
+                  <%= button_to "Eliminar",
+                    post_comment_path(post, comment),
+                    method: :delete,
+                    form: { data: { turbo_confirm: "¿Eliminar comentario?" } },
+                    class: "shrink-0 rounded-lg px-2 py-1 text-xs text-zinc-400 hover:bg-white/5 hover:text-white" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- form -->
+        <div class="mt-auto border-t border-white/10 px-4 py-3">
+          <div id="comment_form_post_<%= post.id %>">
+            <%= form_with model: [post, Comment.new], class: "flex items-center gap-2" do |f| %>
+              <%= f.text_field :body,
+                placeholder: "Escribe un comentario...",
+                class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+
+              <%= f.submit "Enviar",
+                class: "rounded-xl bg-white px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 active:scale-[0.99]" %>
+            <% end %>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  <% end %>
+</section>
+
+
+      </main>
+
+      <!-- Derecha: perfil + sugerencias -->
+      <aside class="sticky top-0 hidden h-screen bg-zinc-950 py-6 pl-6 pr-8 lg:block w-[380px]">
+
+        <div class="space-y-4">
+          <!-- Perfil -->
+          <div class="rounded-2xl border border-white/10 bg-zinc-900/30 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+  <% if current_user.avatar.attached? %>
+    <%= image_tag current_user.avatar, class: "h-full w-full object-cover" %>
+  <% else %>
+    <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
+  <% end %>
+</div>
+
+                <div>
+                  <div class="text-sm font-semibold"><%= current_user.username %></div>
+                  <div class="text-xs text-zinc-400"><%= current_user.email %></div>
+                </div>
+              </div>
+
+              <button class="text-xs font-semibold text-white hover:underline">Cambiar</button>
+            </div>
+          </div>
+
+          <!-- Sugerencias -->
+          <div class="rounded-2xl border border-white/10 bg-zinc-900/30 p-4">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-semibold text-zinc-200">Sugerencias para ti</div>
+              <button class="text-xs text-zinc-300 hover:text-white">Ver todo</button>
+            </div>
+
+            <div class="mt-4 space-y-3">
+              <% 5.times do |i| %>
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="h-9 w-9 rounded-full bg-zinc-800"></div>
+                    <div>
+                      <div class="text-sm font-semibold">sugerido_<%= i+1 %></div>
+                      <div class="text-xs text-zinc-400">Sugerencia de prueba</div>
+                    </div>
+                  </div>
+                  <button class="text-xs font-semibold text-sky-400 hover:text-sky-300">Seguir</button>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="px-1 text-xs text-zinc-500">
+            © <%= Time.current.year %> EIWAPOST
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div data-user-search-target="modal" class="hidden fixed inset-0 z-[100]">
+    <!-- backdrop -->
+    <div data-action="click->user-search#close"
+         class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+    <!-- panel -->
+    <div class="absolute left-1/2 top-10 w-[92vw] max-w-[520px] -translate-x-1/2
+                rounded-3xl border border-white/10 bg-zinc-950/90 shadow-2xl overflow-hidden">
+
+      <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <div class="text-lg font-semibold">Buscar</div>
+        <button type="button"
+                data-action="click->user-search#close"
+                class="rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white">
+          ✕
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div class="relative">
+          <input
+            data-user-search-target="input"
+            data-action="input->user-search#search keydown.enter->user-search#search"
+
+            type="text"
+            placeholder="Buscar"
+            class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3
+                   text-sm text-zinc-100 placeholder:text-zinc-500 outline-none
+                   focus:border-white/20 focus:ring-2 focus:ring-white/10" />
+
+          <button type="button"
+                  data-action="click->user-search#clear"
+                  class="absolute right-3 top-1/2 -translate-y-1/2
+                         rounded-full px-2 py-1 text-zinc-400 hover:bg-white/10">
+            ✕
+          </button>
+        </div>
+
+        <div class="text-xs font-semibold text-zinc-400">Recientes</div>
+
+        <div data-user-search-target="results"
+             class="max-h-[420px] overflow-y-auto pr-1 space-y-2">
+          <div class="py-10 text-center text-sm text-zinc-500">
+            No hay búsquedas recientes.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+<!-- Spotify Floating Player -->
+<div class="fixed bottom-6 right-3 z-[9999] w-[350px] max-w-[90vw]
+            rounded-2xl overflow-hidden shadow-2xl
+            border border-white/10 bg-black/80 backdrop-blur">
+
+  <iframe
+    src="https://open.spotify.com/embed/playlist/2THrbe2hOkmr9l6aCkhKbu?si=76e121953c1045df "
+    width="100%"
+    height="80"
+    frameborder="0"
+    allowtransparency="true"
+    allow="encrypted-media"
+    class="block">
+  </iframe>
+
+</div>
+

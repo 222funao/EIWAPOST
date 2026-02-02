@@ -1,0 +1,96 @@
+
+<% if resource.errors.any? %>
+  <div class="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
+    <%= resource.errors.full_messages.to_sentence %>
+  </div>
+<% end %>
+
+<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+  <div class="mx-auto max-w-xl px-6 py-10">
+
+    <div class="rounded-2xl border border-white/10 bg-zinc-900/30 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-semibold">Editar perfil</h1>
+          <p class="mt-1 text-sm text-zinc-400">Actualiza tu cuenta.</p>
+        </div>
+
+        <%= link_to "Volver", profile_path,
+          class: "rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-zinc-200 hover:bg-white/10" %>
+      </div>
+
+      <% if resource.errors.any? %>
+        <div class="mt-5 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          <div class="font-semibold">Revisa estos errores:</div>
+          <ul class="mt-2 list-disc pl-5">
+            <% resource.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "mt-6 space-y-4" }) do |f| %>
+        
+        <div>
+  <%= f.label :username, "Nombre de usuario", class: "text-sm text-zinc-200" %>
+  <%= f.text_field :username,
+    autocomplete: "username",
+    class: "mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100
+            placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+</div>
+
+
+        <div>
+          <%= f.label :email, "Correo", class: "text-sm text-zinc-200" %>
+          <%= f.email_field :email, autocomplete: "email",
+            class: "mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100
+                    placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+        </div>
+
+        <div>
+          <%= f.label :password, "Nueva contraseña (opcional)", class: "text-sm text-zinc-200" %>
+          <%= f.password_field :password, autocomplete: "new-password",
+            class: "mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100
+                    placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+          <p class="mt-2 text-xs text-zinc-500">Déjalo vacío si no quieres cambiarla.</p>
+        </div>
+
+        <div>
+          <%= f.label :password_confirmation, "Confirmar contraseña", class: "text-sm text-zinc-200" %>
+          <%= f.password_field :password_confirmation, autocomplete: "new-password",
+            class: "mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100
+                    placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+        </div>
+
+        <div class="mt-4">
+  <%= f.label :current_password, "Contraseña actual", class: "text-sm text-zinc-200" %>
+  <%= f.password_field :current_password,
+      class: "mt-2 w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100",
+      autocomplete: "current-password" %>
+  <p class="mt-1 text-xs text-zinc-500">Necesaria para cambiar el correo o la contraseña.</p>
+</div>
+
+
+        <%= f.submit "Guardar cambios",
+          class: "mt-2 w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-zinc-950
+                  hover:bg-zinc-100 active:scale-[0.99] transition" %>
+
+      <% end %>
+    </div>
+
+    <div class="mt-6 rounded-2xl border border-white/10 bg-zinc-900/30 p-6">
+      <h2 class="text-base font-semibold text-zinc-100">Eliminar cuenta</h2>
+      <p class="mt-1 text-sm text-zinc-400">Esto es irreversible.</p>
+
+      <div class="mt-4">
+        <%= button_to "Eliminar mi cuenta",
+          registration_path(resource_name),
+          method: :delete,
+          data: { turbo_confirm: "¿Seguro? Esta acción no se puede deshacer." },
+          class: "w-full rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-200 hover:bg-rose-500/20 transition" %>
+      </div>
+    </div>
+
+  </div>
+</div>

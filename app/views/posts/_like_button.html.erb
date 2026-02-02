@@ -1,0 +1,28 @@
+<div id="like_button_post_<%= post.id %>">
+  <% liked = current_user && Like.exists?(user_id: current_user.id, post_id: post.id) %>
+  <% count = post.likes.count %>
+
+  <% base = "hover:scale-[1.05] active:scale-[0.95] inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-lg leading-none hover:bg-white/10 transition" %>
+
+  <% if liked %>
+    <%= button_to post_like_path(post),
+      method: :delete,
+      form: { data: { turbo: true } },
+      class: "#{base} text-rose-400" do %>
+
+      <span class="leading-none">❤️</span>
+      <span class="text-sm leading-none"><%= count %></span>
+
+    <% end %>
+  <% else %>
+    <%= button_to post_like_path(post),
+      method: :post,
+      form: { data: { turbo: true } },
+      class: "#{base} text-zinc-300 hover:text-white" do %>
+
+      <span class="leading-none">🤍</span>
+      <span class="text-sm leading-none"><%= count %></span>
+
+    <% end %>
+  <% end %>
+</div>

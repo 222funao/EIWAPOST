@@ -1,0 +1,50 @@
+<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+  <div class="mx-auto max-w-2xl px-4 py-10">
+    <div class="rounded-3xl border border-white/10 bg-zinc-900/30 p-8 shadow-2xl">
+      <h1 class="text-2xl font-semibold">Crear post</h1>
+      <p class="mt-2 text-sm text-zinc-400">Sube una imagen o video y escribe tu caption.</p>
+
+      <% if @post.errors.any? %>
+        <div class="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">
+          <div class="font-semibold">Revisa esto:</div>
+          <ul class="mt-2 list-disc space-y-1 pl-5">
+            <% @post.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_with model: @post, local: true, class: "mt-6 space-y-5" do |f| %>
+        <div>
+          <%= f.label :media, "Media (imagen o video)", class: "mb-2 block text-sm text-zinc-300" %>
+          <%= f.file_field :media,
+      multiple: true,
+      accept: "image/*,video/*",
+      class: "block w-full cursor-pointer rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100 file:mr-4 file:rounded-lg file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-zinc-950 hover:file:bg-zinc-100" %>
+
+          <div class="mt-2 text-xs text-zinc-500">
+            Recomendado: imágenes jpg/png/webp o videos mp4/webm.
+          </div>
+        </div>
+
+        <div>
+          <%= f.label :caption, "Caption", class: "mb-2 block text-sm text-zinc-300" %>
+          <%= f.text_area :caption,
+                rows: 4,
+                placeholder: "Escribe algo...",
+                class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <%= f.submit "Publicar",
+                class: "w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 active:scale-[0.99]" %>
+        </div>
+
+        <div class="text-center text-sm text-zinc-400">
+          <%= link_to "Volver al feed", root_path, class: "hover:text-white hover:underline" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,14 +1,40 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  get "/profiles/:id", to: "profiles#show", as: :public_profile
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
+  # ✅ tu perfil (sin id)
+  get  "/profile", to: "profiles#me", as: :profile
+  patch "/profile", to: "profiles#update"
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # (opcional) si no usas edit propio, bórralo:
+  # get "/profile/edit", to: "profiles#edit", as: :edit_profile
+ # ✅ búsqueda de usuarios (Turbo Frame)
+  get "/search/users", to: "users#search", as: :search_users
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # ✅ seguir / dejar de seguir (por id)
+  post   "/users/:id/follow", to: "follows#create",  as: :user_follow
+  delete "/users/:id/follow", to: "follows#destroy", as: :user_unfollow
+resources :users, only: [] do
+  resource :follow, only: [:create, :destroy]
+end
+namespace :search do
+  resources :users, only: [:index]
+end
+
+  resources :posts, only: [:new, :create] do
+    resources :comments, only: [:create, :destroy]
+    resources :users, only: [:show]
+    resource :like, only: [:create, :destroy]
+  end
+
+  devise_for :users
+
+  authenticated :user do
+    root "feed#index", as: :authenticated_root
+  end
+
+  unauthenticated do
+    root to: redirect("/users/sign_in")
+  end
+
+  get "feed", to: "feed#index"
 end

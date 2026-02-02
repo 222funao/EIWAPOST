@@ -1,0 +1,11 @@
+<%= turbo_stream.append "comments_list_post_#{@post.id}" do %>
+  <%= render partial: "comments/comment", locals: { comment: @comment } %>
+<% end %>
+
+<%= turbo_stream.replace "comments_count_post_#{@post.id}" do %>
+  <span id="comments_count_post_<%= @post.id %>"><%= @post.comments_count %></span>
+<% end %>
+
+<%= turbo_stream.replace "comment_form_post_#{@post.id}" do %>
+  <%= render partial: "comments/form", locals: { post: @post, comment: Comment.new } %>
+<% end %>

@@ -1,0 +1,36 @@
+<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+  <div class="min-h-screen w-full lg:grid lg:grid-cols-[5fr_3fr]">
+    <!-- Panel izquierdo (imagen) -->
+    <div class="relative hidden lg:block">
+      <%= image_tag "auth/login-left.jpg",
+        class: "absolute inset-0 h-full w-full object-cover",
+        alt: "EIWAPOST cover" %>
+
+      <div class="absolute inset-0 bg-gradient-to-tr from-zinc-950 via-zinc-950/40 to-transparent"></div>
+
+      <div class="relative z-10 flex h-full flex-col justify-between p-12">
+        <div>
+          <div class="text-3xl font-semibold tracking-tight">EIWAPOST</div>
+          <div class="mt-2 max-w-md text-sm text-zinc-300">
+            Red social solo apta para personas superdotadas🔥.
+          </div>
+        </div>
+
+        
+      </div>
+    </div>
+
+    <!-- Panel derecho (formulario) -->
+    <div class="flex min-h-screen items-center justify-center px-6 py-10">
+      <div class="w-full max-w-md">
+        <div class="rounded-3xl border border-white/10 bg-zinc-900/40 p-8 shadow-2xl">
+          <%= yield %>
+        </div>
+
+        <div class="mt-8 text-center text-xs text-zinc-500">
+          © <%= Time.current.year %> EIWAPOST · Hecho con Rails
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,5 @@
+<%= turbo_stream.remove dom_id(@comment) %>
+
+<%= turbo_stream.replace "comments_count_post_#{@post.id}" do %>
+  <span id="comments_count_post_<%= @post.id %>"><%= @post.comments_count %></span>
+<% end %>

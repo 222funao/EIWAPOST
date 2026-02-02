@@ -1,10 +1,30 @@
-/*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
- */
+/* Scrollbar estilo Instagram para el panel de comentarios */
+.comments-scroll {
+  scrollbar-width: thin;                 /* Firefox */
+  scrollbar-color: rgba(255,255,255,.18) transparent;
+}
+
+/* Chrome / Edge / Safari */
+.comments-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.comments-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.comments-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  border: 3px solid transparent;         /* hace que se vea más “delgada” */
+  background-clip: padding-box;
+}
+
+.comments-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+
+

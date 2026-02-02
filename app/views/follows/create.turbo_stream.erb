@@ -1,0 +1,11 @@
+<%= turbo_stream.replace "follow_button_user_#{@user.id}" do %>
+  <%= render "users/follow_button", user: @user %>
+<% end %>
+
+<%= turbo_stream.replace "followers_count_user_#{@user.id}" do %>
+  <%= render "profiles/followers_count", user: @user %>
+<% end %>
+
+<%= turbo_stream.replace "following_count_user_#{current_user.id}" do %>
+  <%= render "profiles/following_count", user: current_user %>
+<% end %>
