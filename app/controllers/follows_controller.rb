@@ -8,7 +8,6 @@ class FollowsController < ApplicationController
     Follow.find_or_create_by!(follower: current_user, followed: @user)
     respond_to do |format|
       format.turbo_stream
-      format.html { render "follows/create", formats: :turbo_stream }
       format.json do
         render json: {
           followed: true,
@@ -23,7 +22,6 @@ class FollowsController < ApplicationController
     Follow.where(follower: current_user, followed: @user).destroy_all
     respond_to do |format|
       format.turbo_stream
-      format.html { render "follows/destroy", formats: :turbo_stream }
       format.json do
         render json: {
           followed: false,
