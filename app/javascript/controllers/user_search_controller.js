@@ -90,10 +90,20 @@ export default class extends Controller {
     this.resultsTarget.innerHTML = users
       .map((u) => {
         const followed = !!u.followed
-        const label = followed ? "Siguiendo" : "Seguir"
-        const btnClass = followed
-          ? "shrink-0 rounded-lg bg-zinc-700/40 px-3 py-1.5 text-xs font-semibold text-zinc-100 hover:bg-zinc-700/55"
-          : "shrink-0 rounded-lg bg-sky-500/15 px-3 py-1.5 text-xs font-semibold text-sky-300 hover:bg-sky-500/25"
+        const followsYou = !!u.follows_you
+        const friends = followed && followsYou
+        const label = friends
+          ? "Amigos"
+          : followed
+            ? "Siguiendo"
+            : followsYou
+              ? "Seguir también"
+              : "Seguir"
+        const btnClass = friends
+          ? "shrink-0 rounded-lg bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/25"
+          : followed
+            ? "shrink-0 rounded-lg bg-zinc-700/40 px-3 py-1.5 text-xs font-semibold text-zinc-100 hover:bg-zinc-700/55"
+            : "shrink-0 rounded-lg bg-sky-500/15 px-3 py-1.5 text-xs font-semibold text-sky-300 hover:bg-sky-500/25"
 
         return `
           <div class="flex items-center justify-between gap-3 rounded-xl px-3 py-2 hover:bg-white/5">
@@ -109,6 +119,7 @@ export default class extends Controller {
               type="button"
               data-user-id="${u.id}"
               data-followed="${followed ? "1" : "0"}"
+              data-follows-you="${followsYou ? "1" : "0"}"
               data-action="click->user-search#toggleFollow"
               class="${btnClass}">
               ${label}
@@ -141,16 +152,28 @@ export default class extends Controller {
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
 
-      const data = await res.json() // { followed: true/false }
+      const data = await res.json()
       const followed = !!data.followed
+      const followsYou = !!data.follows_you
+      const friends = !!data.friends
 
       btn.dataset.followed = followed ? "1" : "0"
-      btn.textContent = followed ? "Siguiendo" : "Seguir"
+      btn.dataset.followsYou = followsYou ? "1" : "0"
+
+      btn.textContent = friends
+        ? "Amigos"
+        : followed
+          ? "Siguiendo"
+          : followsYou
+            ? "Seguir también"
+            : "Seguir"
 
       // reset clases
-      btn.className = followed
-        ? "shrink-0 rounded-lg bg-zinc-700/40 px-3 py-1.5 text-xs font-semibold text-zinc-100 hover:bg-zinc-700/55"
-        : "shrink-0 rounded-lg bg-sky-500/15 px-3 py-1.5 text-xs font-semibold text-sky-300 hover:bg-sky-500/25"
+      btn.className = friends
+        ? "shrink-0 rounded-lg bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/25"
+        : followed
+          ? "shrink-0 rounded-lg bg-zinc-700/40 px-3 py-1.5 text-xs font-semibold text-zinc-100 hover:bg-zinc-700/55"
+          : "shrink-0 rounded-lg bg-sky-500/15 px-3 py-1.5 text-xs font-semibold text-sky-300 hover:bg-sky-500/25"
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err)

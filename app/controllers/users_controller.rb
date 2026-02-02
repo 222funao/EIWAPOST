@@ -22,13 +22,21 @@ class UsersController < ApplicationController
         []
       end
 
+    follows_you_ids =
+      if users.any?
+        Follow.where(followed_id: current_user.id, follower_id: users.select(:id)).pluck(:follower_id)
+      else
+        []
+      end
+
     render json: users.map { |u|
       {
         id: u.id,
         username: u.username,
         avatar_url: avatar_path_for(u),
         profile_url: public_profile_path(u),
-        followed: followed_ids.include?(u.id)
+        followed: followed_ids.include?(u.id),
+        follows_you: follows_you_ids.include?(u.id)
       }
     }
   end
