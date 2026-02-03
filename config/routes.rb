@@ -14,11 +14,16 @@ Rails.application.routes.draw do
   post   "/users/:id/follow", to: "follows#create",  as: :user_follow
   delete "/users/:id/follow", to: "follows#destroy", as: :user_unfollow
 
+  # ✅ mensajes (solo entre amigos)
+  get  "/messages", to: "messages#index", as: :messages
+  post "/messages/:user_id", to: "messages#create", as: :user_messages
+
   resources :posts, only: [:new, :create] do
     resources :comments, only: [:create, :destroy]
     resources :users, only: [:show]
     resource :like, only: [:create, :destroy]
   end
+  resources :stories, only: [:create]
 
   devise_for :users
 

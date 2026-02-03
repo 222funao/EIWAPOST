@@ -1,12 +1,14 @@
 <!-- Sidebar izquierda (colapsado -> expandible al hover) -->
-<aside class="group sticky top-0 z-50 hidden h-screen  lg:block">
+<aside class="group sticky top-0 z-50 hidden h-screen lg:block">
 
   <!-- contenedor con ancho animado -->
-  <div class="flex h-full w-[96px] flex-col transition-[width] duration-200 ease-out group-hover:w-[220px]">
+  <div class="relative flex h-full w-[96px] flex-col transition-[width,transform] duration-200 ease-out group-hover:w-[220px] group-hover:translate-x-0">
+    <!-- Fondo sidebar -->
+    <div class="pointer-events-none absolute inset-0 -translate-x-3 bg-zinc-950/90 transition-all duration-200 ease-out group-hover:translate-x-0"></div>
 
 
     <!-- Logo -->
-    <div class="px-4 py-6">
+    <div class="relative px-4 py-6">
       <div class="flex items-center gap-3">
         <%= image_tag "logo/eiwa.png",
   class: "h-9 w-9 rounded-full object-cover" %>
@@ -20,7 +22,7 @@
     </div>
 
     <!-- Nav -->
-    <nav class="mt-2 flex flex-1 flex-col gap-1 px-2 text-sm">
+    <nav class="relative mt-2 flex flex-1 flex-col gap-1 px-2 text-sm">
       <%= link_to root_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3" do %>
 
         <span class="text-xl">🏠</span>
@@ -60,7 +62,7 @@
 
       <% end %>
 
-      <%= link_to "#", class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3" do %>
+      <%= link_to messages_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3" do %>
 
         <span class="text-xl">✉️</span>
         <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
@@ -110,7 +112,7 @@
     </nav>
 
     <!-- Cerrar sesión -->
-    <div class="p-2">
+    <div class="relative p-2">
       <%= link_to destroy_user_session_path, data: { turbo_method: :delete },
         class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3"  do %>
         <span class="text-xl">🚪</span>

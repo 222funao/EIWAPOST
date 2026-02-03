@@ -33,25 +33,17 @@ export default class extends Controller {
   }
 
   _transition(fromEl, toEl) {
-    // 1) Preparar el panel que entra (ponerlo en su lugar pero invisible)
-    toEl.classList.remove("absolute", "-left-[99999px]", "pointer-events-none")
-    toEl.classList.add("opacity-0", "translate-x-2")
+    if (fromEl === toEl) return
 
-    // Forzar reflow para que el browser “registre” el estado inicial antes de animar
+    // Hide current panel immediately to avoid flicker
+    fromEl.classList.add("hidden")
+    fromEl.classList.remove("opacity-100")
+
+    // Show new panel with a subtle fade-in
+    toEl.classList.remove("hidden")
+    toEl.classList.add("opacity-0")
     void toEl.offsetWidth
-
-    // 2) Animar salida del que estaba visible
-    fromEl.classList.add("opacity-0", "translate-x-2", "pointer-events-none")
-
-    // 3) Animar entrada del nuevo
-    toEl.classList.remove("opacity-0", "translate-x-2")
-    toEl.classList.add("opacity-100", "translate-x-0")
-
-    // 4) Al terminar la animación, mandar el anterior fuera de pantalla para que no ocupe espacio
-    window.clearTimeout(this._timer)
-    this._timer = window.setTimeout(() => {
-      fromEl.classList.remove("opacity-100", "translate-x-0")
-      fromEl.classList.add("absolute", "-left-[99999px]")
-    }, 320) // un poquito > 300ms por seguridad
+    toEl.classList.remove("opacity-0")
+    toEl.classList.add("opacity-100")
   }
 }

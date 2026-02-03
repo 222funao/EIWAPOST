@@ -23,5 +23,8 @@ module Eiwapost
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Allow explicit Spanish locale usage in views (e.g., time_ago_in_words)
+    config.i18n.available_locales = [:en, :es]
   end
 end

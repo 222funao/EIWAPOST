@@ -3,13 +3,15 @@ class PostsController < ApplicationController
 
   def new
     @post = current_user.posts.build
+    @story = current_user.stories.build
   end
 
   def create
     @post = current_user.posts.build(post_params)
     if @post.save
-      redirect_to root_path, notice: "Publicado ✅"
+      redirect_to root_path, notice: "Publicado"
     else
+      @story = current_user.stories.build
       render :new, status: :unprocessable_entity
     end
   end

@@ -1,0 +1,36 @@
+<% is_me = message.sender_id == current_user.id %>
+<div class="flex <%= is_me ? "justify-end" : "justify-start" %>">
+  <div class="<%= is_me ? "bg-sky-500/15 text-sky-100" : "bg-white/10 text-zinc-100" %>
+              inline-flex flex-col max-w-[70%] rounded-2xl px-4 py-3">
+    <% if message.body.present? %>
+      <div class="text-sm leading-relaxed"><%= message.body %></div>
+    <% end %>
+
+    <% if message.media.attached? %>
+      <% media_images = message.media.select { |m| m.content_type&.start_with?("image/") } %>
+      <% media_videos = message.media.select { |m| m.content_type&.start_with?("video/") } %>
+
+      <% if media_images.any? %>
+        <div class="mt-3 grid grid-cols-1 gap-2">
+          <% media_images.each do |img| %>
+            <%= image_tag img,
+              class: "w-full max-w-[360px] aspect-[4/5] rounded-xl object-cover ring-1 ring-white/10" %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if media_videos.any? %>
+        <div class="mt-3 grid grid-cols-1 gap-2">
+          <% media_videos.each do |vid| %>
+            <%= video_tag vid,
+              class: "w-full max-w-[360px] aspect-[4/5] rounded-xl object-cover ring-1 ring-white/10 cursor-pointer",
+              muted: true,
+              loop: true,
+              playsinline: true,
+              data: { controller: "message-media", action: "click->message-media#toggle" } %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

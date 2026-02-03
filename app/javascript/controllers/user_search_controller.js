@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["modal", "input", "results"]
+  static values = { postsUrl: String }
 
   connect() {
     this._onKeydown = (e) => {
@@ -37,6 +38,22 @@ export default class extends Controller {
     this._debounceTimer = setTimeout(() => {
       this.fetchResults(q)
     }, 200)
+  }
+
+  filterPosts(event) {
+    if (event?.type === "keydown" && event.key === "Enter") event.preventDefault()
+    if (!this.hasPostsUrlValue) return
+
+    const q = this.inputTarget.value.trim()
+    const url = new URL(this.postsUrlValue, window.location.origin)
+
+    if (q) {
+      url.searchParams.set("q", q)
+    } else {
+      url.searchParams.delete("q")
+    }
+
+    window.location.href = url.toString()
   }
 
   async fetchResults(q) {

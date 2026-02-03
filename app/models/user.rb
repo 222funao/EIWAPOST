@@ -1,11 +1,16 @@
 class User < ApplicationRecord
-has_many :likes, dependent: :destroy
+  has_many :likes, dependent: :destroy
   has_many :liked_posts, through: :likes, source: :post
   has_many :comments, dependent: :destroy
-has_many :posts, dependent: :destroy
-has_one_attached :avatar
+  has_many :posts, dependent: :destroy
+  has_many :stories, dependent: :destroy
+  has_one_attached :avatar
 
-  
+  has_many :active_follows, class_name: "Follow", foreign_key: :follower_id, dependent: :destroy
+  has_many :passive_follows, class_name: "Follow", foreign_key: :followed_id, dependent: :destroy
+  has_many :following, through: :active_follows, source: :followed
+  has_many :followers, through: :passive_follows, source: :follower
+
   attr_accessor :login
 
   devise :database_authenticatable, :registerable,
@@ -14,9 +19,9 @@ has_one_attached :avatar
   validates :username, presence: true,
                        uniqueness: { case_sensitive: false },
                        length: { minimum: 3, maximum: 20 },
-                       format: { with: /\A[a-zA-Z0-9_]+\z/, message: "solo letras, números y _" }
+                       format: { with: /\A[a-zA-Z0-9_]+\z/, message: "solo letras, nÃºmeros y _" }
 
- 
+  before_create :set_default_avatar
 
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
@@ -27,13 +32,25 @@ has_one_attached :avatar
       .first
   end
 
-  private
+  def following?(user)
+    Follow.exists?(follower_id: id, followed_id: user.id)
+  end
 
-class User < ApplicationRecord
-  # Si usas ActiveStorage para avatar
-  has_one_attached :avatar
+  # "Amigos" = se siguen ambos
+  def friends_with?(user)
+    following?(user) && user.following?(self)
+  end
 
-  before_create :set_default_avatar
+  def friend_ids
+    followed_ids = Follow.where(follower_id: id).pluck(:followed_id)
+    return [] if followed_ids.empty?
+
+    Follow.where(followed_id: id, follower_id: followed_ids).pluck(:follower_id)
+  end
+
+  def friends
+    User.where(id: friend_ids)
+  end
 
   private
 
@@ -49,21 +66,5 @@ class User < ApplicationRecord
       filename: "default.png",
       content_type: "image/png"
     )
-  end
-end
-
- has_many :active_follows,  class_name: "Follow", foreign_key: :follower_id, dependent: :destroy
-  has_many :passive_follows, class_name: "Follow", foreign_key: :followed_id, dependent: :destroy
-
-  has_many :following, through: :active_follows,  source: :followed
-  has_many :followers, through: :passive_follows, source: :follower
-
-  def following?(user)
-    Follow.exists?(follower_id: id, followed_id: user.id)
-  end
-
-  # “Amigos” = se siguen ambos
-  def friends_with?(user)
-    following?(user) && user.following?(self)
   end
 end

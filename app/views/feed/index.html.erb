@@ -1,4 +1,6 @@
-<div data-controller="user-search" class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+<div data-controller="user-search"
+     data-user-search-posts-url-value="<%= feed_path %>"
+     class="min-h-screen w-full bg-zinc-950 text-zinc-100">
   <div class="w-full pr-6 lg:pr-12 2xl:pr-6 pl-0">
 
     <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_1fr_340px]">
@@ -9,26 +11,93 @@
       <main class="py-6 pl-10 pr-10 lg:pl-29 lg:pr-4">
 
 
-        <!-- Historias -->
-        <section class="rounded-2xl border border-white/10 bg-zinc-900/30 p-4 mx-auto w-full max-w-[690px]">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-zinc-200">Historias</h2>
-            <button class="text-xs text-zinc-400 hover:text-white">Ver todo</button>
-          </div>
+        <% if @story_groups.present? %>
+          <!-- Historias -->
+          <section
+            data-controller="stories-viewer"
+            data-stories-viewer-stories-value="<%= json_escape(@stories_data.to_json) %>"
+            data-stories-viewer-image-duration-value="5000"
+            data-stories-viewer-current-user-id-value="<%= current_user.id %>"
+            style="--story-count: <%= @story_groups.size %>; width: min(100%, calc(var(--story-count) * 96px + 72px));"
+            class="rounded-2xl border border-white/10 bg-zinc-900/30 p-0 mx-auto w-full">
+           
 
-          <div class="mt-4 flex gap-4 overflow-x-auto pb-2">
-            <% 10.times do |i| %>
-              <div class="flex w-20 flex-col items-center gap-2">
-                <div class="rounded-full bg-gradient-to-tr from-fuchsia-500 via-rose-500 to-amber-400 p-[2px]">
-                  <div class="h-16 w-16 rounded-full bg-zinc-950 p-[2px]">
-                    <div class="h-full w-full rounded-full bg-zinc-800"></div>
+            <div data-stories-viewer-target="list" class="mt-4 flex gap-4 overflow-x-auto pb-2 justify-center">
+              <% @story_groups.each_with_index do |(user, stories), idx| %>
+                <button
+                  type="button"
+                  data-action="click->stories-viewer#open"
+                  data-stories-viewer-user-id-param="<%= user.id %>"
+                  data-story-user-id="<%= user.id %>"
+                  class="flex w-20 flex-col items-center gap-2">
+                  <div data-story-ring class="rounded-full bg-gradient-to-tr from-fuchsia-500 via-rose-500 to-amber-400 p-[2px]">
+                    <div class="h-16 w-16 rounded-full bg-zinc-950 p-[2px]">
+                      <div class="h-full w-full overflow-hidden rounded-full bg-zinc-800">
+                        <% if user.avatar.attached? %>
+                          <%= image_tag user.avatar, class: "h-full w-full object-cover" %>
+                        <% else %>
+                          <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-full truncate text-center text-xs text-zinc-300"><%= user.username %></div>
+                </button>
+              <% end %>
+            </div>
+
+            <!-- Viewer -->
+            <div data-stories-viewer-target="modal" class="hidden fixed inset-0 z-[9999]">
+              <div data-action="click->stories-viewer#close"
+                   class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+
+              <div class="relative z-10 mx-auto flex h-full max-w-[980px] items-center justify-center px-4">
+                <button type="button"
+                        data-action="click->stories-viewer#prev"
+                        class="absolute left-0 top-0 h-full w-1/3"></button>
+                <button type="button"
+                        data-action="click->stories-viewer#next"
+                        class="absolute right-0 top-0 h-full w-1/3"></button>
+
+                <div class="relative w-full max-w-[380px]">
+                  <div class="absolute right-0 top-[-46px] flex items-center gap-2">
+                    <button type="button"
+                            data-action="click->stories-viewer#close"
+                            class="rounded-full bg-white/10 px-3 py-2 text-sm text-white hover:bg-white/20">
+                      X
+                    </button>
+                  </div>
+
+                  <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl">
+                    <div class="absolute left-0 right-0 top-0 z-20 px-3 pt-3">
+                      <div data-stories-viewer-target="progress" class="flex gap-1"></div>
+                      <div class="mt-3 flex items-center justify-between text-white">
+                        <div class="flex items-center gap-2">
+                          <img data-stories-viewer-target="avatar" class="h-7 w-7 rounded-full object-cover" alt="" />
+                          <div class="text-xs font-semibold" data-stories-viewer-target="username"></div>
+                          <button type="button"
+                                  data-stories-viewer-target="soundToggle"
+                                  data-action="click->stories-viewer#toggleSound"
+                                  class="rounded-full  px-2 py-1 text-[10px] text-white/80 ">
+                            🔊
+                          </button>
+                          <div class="text-xs text-white/70" data-stories-viewer-target="time"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="relative aspect-[9/16] w-full bg-black">
+                      <img data-stories-viewer-target="image" class="hidden h-full w-full object-contain" alt="" />
+                      <video data-stories-viewer-target="video"
+                             class="hidden h-full w-full object-contain"
+                             playsinline></video>
+                    </div>
                   </div>
                 </div>
-                <div class="w-full truncate text-center text-xs text-zinc-300">usuario_<%= i+1 %></div>
               </div>
-            <% end %>
-          </div>
-        </section>
+            </div>
+          </section>
+        <% end %>
 
 <!-- Posts -->
 <section class="mt-6 space-y-6 mx-auto w-full max-w-[920px]">
@@ -56,7 +125,7 @@
                 <div class="text-base font-semibold"><%= link_to post.user.username,
             public_profile_path(post.user),
             class: "hover:underline" %></div>
-                <div class="text-xs text-zinc-400"><%= time_ago_in_words(post.created_at) %> back</div>
+                <div class="text-xs text-zinc-400">hace <%= time_ago_in_words(post.created_at, locale: :es) %></div>
               </div>
             </div>
             <button class="rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white">⋯</button>
@@ -222,18 +291,25 @@
         <!-- lista comentarios -->
         <div class="comments-scroll flex-1 min-h-0 px-4 pb-3 overflow-y-auto">
 
-          <div id="comments_list_post_<%= post.id %>" class="space-y-2 pr-1">
+          <div id="comments_list_post_<%= post.id %>" class="space-y-1 pr-1">
             <% post.comments.order(created_at: :asc).each do |comment| %>
-              <div id="<%= dom_id(comment) %>" class="flex items-start justify-between gap-3 py-2">
+              <div id="<%= dom_id(comment) %>" class="flex items-start justify-between gap-3 py-1">
                 <div class="min-w-0">
-                  <div class="text-sm">
-                    <span class="font-semibold text-zinc-200"><%= link_to comment.user.username,
-  public_profile_path(comment.user),
-  class: "font-semibold text-zinc-200 hover:underline" %></span>
-                    <span class="text-zinc-300 break-words"><%= comment.body %></span>
+                  <div class="flex items-start gap-2 min-w-0">
+                    <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+                      <% if comment.user.avatar.attached? %>
+                        <%= image_tag comment.user.avatar, class: "h-full w-full object-cover" %>
+                      <% else %>
+                        <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
+                      <% end %>
+                    </span>
+                    <div class="min-w-0 text-sm leading-snug">
+                      <%= link_to comment.user.username,
+                        public_profile_path(comment.user),
+                        class: "font-semibold text-zinc-200 hover:underline" %>
+                      <span class="text-zinc-300 break-words"><%= comment.body %></span>
+                    </div>
                   </div>
-                  <div class="mt-1 text-xs text-zinc-500"><%= time_ago_in_words(comment.created_at) if comment.created_at %> back
-</div>
                 </div>
 
                 <% if comment.user_id == current_user.id %>
@@ -348,10 +424,11 @@
         <div class="relative">
           <input
             data-user-search-target="input"
-            data-action="input->user-search#search keydown.enter->user-search#search"
+            data-action="input->user-search#search keydown.enter->user-search#filterPosts"
 
             type="text"
             placeholder="Buscar"
+            value="<%= @query %>"
             class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3
                    text-sm text-zinc-100 placeholder:text-zinc-500 outline-none
                    focus:border-white/20 focus:ring-2 focus:ring-white/10" />
@@ -394,4 +471,3 @@
   </iframe>
 
 </div>
-
