@@ -61,6 +61,7 @@
       <!-- Panel de conversacion -->
       <main class="relative h-screen overflow-hidden">
         <% if @active_user %>
+          <%= turbo_stream_from @conversation.stream_for(current_user) %>
           <div class="flex h-full flex-col">
             <header class="flex items-center justify-between border-b border-white/10 px-6 py-4">
               <%= link_to public_profile_path(@active_user),

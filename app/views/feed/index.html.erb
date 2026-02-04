@@ -293,7 +293,7 @@
 
           <div id="comments_list_post_<%= post.id %>" class="space-y-1 pr-1">
             <% post.comments.order(created_at: :asc).each do |comment| %>
-              <div id="<%= dom_id(comment) %>" class="flex items-start justify-between gap-3 py-1">
+              <div id="<%= dom_id(comment) %>" class="flex items-start justify-between gap-3 py-2">
                 <div class="min-w-0">
                   <div class="flex items-start gap-2 min-w-0">
                     <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">

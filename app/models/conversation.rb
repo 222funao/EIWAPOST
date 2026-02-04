@@ -20,6 +20,10 @@ class Conversation < ApplicationRecord
     user.id == user_a_id ? user_b : user_a
   end
 
+  def stream_for(user)
+    "conversation_#{id}_user_#{user.id}"
+  end
+
   private
 
   def different_users
