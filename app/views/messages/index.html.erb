@@ -62,7 +62,7 @@
       <main class="relative h-screen overflow-hidden">
         <% if @active_user %>
           <%= turbo_stream_from @conversation.stream_for(current_user) %>
-          <div class="flex h-full flex-col">
+          <div class="flex h-full flex-col" data-controller="message-media">
             <header class="flex items-center justify-between border-b border-white/10 px-6 py-4">
               <%= link_to public_profile_path(@active_user),
                 class: "flex items-center gap-3 hover:opacity-90" do %>
@@ -94,6 +94,35 @@
                 <%= render "messages/form", active_user: @active_user, message: Message.new %>
               </div>
             </div>
+
+            <div
+              data-message-media-target="modal"
+              data-action="click->message-media#closeOnBackdrop keydown.esc->message-media#close"
+              tabindex="-1"
+              class="hidden fixed inset-0 z-[140] bg-zinc-950/85 backdrop-blur-sm p-4 sm:p-8">
+              <button
+                type="button"
+                class="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-black/45 text-xl text-white ring-1 ring-white/25 transition hover:bg-black/65"
+                data-action="click->message-media#close"
+                aria-label="Cerrar vista previa">
+                ✕
+              </button>
+
+              <div class="grid h-full place-items-center" data-action="click->message-media#ignore">
+                <div class="inline-block max-w-[92vw] rounded-3xl bg-gradient-to-br from-zinc-900/95 via-zinc-950/95 to-sky-950/65 p-3 shadow-[0_30px_110px_rgba(2,132,199,0.23)] ring-1 ring-white/15 sm:p-4">
+                  <%= image_tag "",
+                    data: { message_media_target: "image" },
+                    class: "hidden h-[84vh] w-auto max-w-[92vw] rounded-2xl object-contain" %>
+
+                  <%= video_tag "",
+                    data: { message_media_target: "video" },
+                    class: "hidden h-[84vh] w-auto max-w-[92vw] rounded-2xl ring-1 ring-white/15",
+                    controls: true,
+                    playsinline: true,
+                    preload: "metadata" %>
+                </div>
+              </div>
+            </div>
           </div>
         <% else %>
           <div class="grid h-full place-items-center px-6">
@@ -115,4 +144,3 @@
     <%= render "shared/user_search_modal" %>
   </div>
 </div>
-
