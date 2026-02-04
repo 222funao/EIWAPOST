@@ -1,6 +1,4 @@
-<div data-controller="user-search"
-     data-user-search-posts-url-value="<%= feed_path %>"
-     class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
   <div class="w-full pr-6 lg:pr-12 2xl:pr-6 pl-0">
 
     <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_1fr_340px]">
@@ -125,7 +123,9 @@
                 <div class="text-base font-semibold"><%= link_to post.user.username,
             public_profile_path(post.user),
             class: "hover:underline" %></div>
-                <div class="text-xs text-zinc-400">hace <%= time_ago_in_words(post.created_at, locale: :es) %></div>
+                <div class="text-xs text-zinc-400">
+                  <%= link_to "hace #{time_ago_in_words(post.created_at, locale: :es)}", post_path(post), class: "hover:underline" %>
+                </div>
               </div>
             </div>
             <button class="rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white">⋯</button>
@@ -236,7 +236,7 @@
                 <span class="font-semibold"><%= link_to post.user.username,
             public_profile_path(post.user),
             class: "hover:underline" %></span>
-                <%= post.caption %>
+                <%= render_with_mentions(post.caption) %>
               </div>
             <% end %>
 
@@ -307,7 +307,7 @@
                       <%= link_to comment.user.username,
                         public_profile_path(comment.user),
                         class: "font-semibold text-zinc-200 hover:underline" %>
-                      <span class="text-zinc-300 break-words"><%= comment.body %></span>
+                      <span class="text-zinc-300 break-words"><%= render_with_mentions(comment.body) %></span>
                     </div>
                   </div>
                 </div>
@@ -368,88 +368,18 @@
                 </div>
               </div>
 
-              <button class="text-xs font-semibold text-white hover:underline">Cambiar</button>
+              
             </div>
           </div>
 
           <!-- Sugerencias -->
-          <div class="rounded-2xl border border-white/10 bg-zinc-900/30 p-4">
-            <div class="flex items-center justify-between">
-              <div class="text-sm font-semibold text-zinc-200">Sugerencias para ti</div>
-              <button class="text-xs text-zinc-300 hover:text-white">Ver todo</button>
-            </div>
-
-            <div class="mt-4 space-y-3">
-              <% 5.times do |i| %>
-                <div class="flex items-center justify-between gap-3">
-                  <div class="flex items-center gap-3">
-                    <div class="h-9 w-9 rounded-full bg-zinc-800"></div>
-                    <div>
-                      <div class="text-sm font-semibold">sugerido_<%= i+1 %></div>
-                      <div class="text-xs text-zinc-400">Sugerencia de prueba</div>
-                    </div>
-                  </div>
-                  <button class="text-xs font-semibold text-sky-400 hover:text-sky-300">Seguir</button>
-                </div>
-              <% end %>
-            </div>
-          </div>
+          
 
           <div class="px-1 text-xs text-zinc-500">
             © <%= Time.current.year %> EIWAPOST
           </div>
         </div>
       </aside>
-    </div>
-  </div>
-  <div data-user-search-target="modal" class="hidden fixed inset-0 z-[100]">
-    <!-- backdrop -->
-    <div data-action="click->user-search#close"
-         class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-
-    <!-- panel -->
-    <div class="absolute left-1/2 top-10 w-[92vw] max-w-[520px] -translate-x-1/2
-                rounded-3xl border border-white/10 bg-zinc-950/90 shadow-2xl overflow-hidden">
-
-      <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
-        <div class="text-lg font-semibold">Buscar</div>
-        <button type="button"
-                data-action="click->user-search#close"
-                class="rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white">
-          ✕
-        </button>
-      </div>
-
-      <div class="p-5 space-y-4">
-        <div class="relative">
-          <input
-            data-user-search-target="input"
-            data-action="input->user-search#search keydown.enter->user-search#filterPosts"
-
-            type="text"
-            placeholder="Buscar"
-            value="<%= @query %>"
-            class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3
-                   text-sm text-zinc-100 placeholder:text-zinc-500 outline-none
-                   focus:border-white/20 focus:ring-2 focus:ring-white/10" />
-
-          <button type="button"
-                  data-action="click->user-search#clear"
-                  class="absolute right-3 top-1/2 -translate-y-1/2
-                         rounded-full px-2 py-1 text-zinc-400 hover:bg-white/10">
-            ✕
-          </button>
-        </div>
-
-        <div class="text-xs font-semibold text-zinc-400">Recientes</div>
-
-        <div data-user-search-target="results"
-             class="max-h-[420px] overflow-y-auto pr-1 space-y-2">
-          <div class="py-10 text-center text-sm text-zinc-500">
-            No hay búsquedas recientes.
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -471,3 +401,7 @@
   </iframe>
 
 </div>
+
+
+
+

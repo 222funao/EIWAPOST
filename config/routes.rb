@@ -18,12 +18,12 @@ Rails.application.routes.draw do
   get  "/messages", to: "messages#index", as: :messages
   post "/messages/:user_id", to: "messages#create", as: :user_messages
 
-  resources :posts, only: [:new, :create] do
+  resources :posts, only: [:new, :create, :show] do
     resources :comments, only: [:create, :destroy]
     resources :users, only: [:show]
     resource :like, only: [:create, :destroy]
   end
-  resources :stories, only: [:create]
+  resources :stories, only: [:create, :show]
 
   devise_for :users
 

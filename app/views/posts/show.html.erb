@@ -1,0 +1,177 @@
+<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+  <div class="w-full pr-6 lg:pr-12 2xl:pr-6 pl-0">
+    <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_1fr_340px]">
+      <%= render "shared/sidebar" %>
+
+      <main class="relative py-6 pl-10 pr-10 lg:pl-29 lg:pr-4">
+        <div class="fixed inset-0 z-[200]">
+          <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+
+          <div class="relative z-10 mx-auto flex h-full max-w-[1100px] items-center justify-center px-4">
+            <div class="relative w-full max-h-[90vh] h-[90vh] overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/40 shadow-2xl lg:grid lg:grid-cols-[1.1fr_0.9fr]">
+              <%= link_to root_path,
+                class: "absolute right-4 top-4 z-20 rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white" do %>
+                ✕
+              <% end %>
+
+              <div class="relative bg-black">
+                <% if @post.media.attached? %>
+                  <% if @post.media.count == 1 %>
+                    <% file = @post.media.first %>
+
+                    <div class="relative w-full overflow-hidden bg-black aspect-[6/7]">
+                      <% if file.content_type.start_with?("image/") %>
+                        <%= image_tag file, class: "absolute inset-0 h-full w-full object-contain" %>
+                      <% else %>
+                        <div class="video-wrapper absolute inset-0">
+                          <%= video_tag url_for(file),
+                            class: "h-full w-full object-contain",
+                            autoplay: true,
+                            loop: true,
+                            muted: true,
+                            playsinline: true,
+                            data: { video: true } %>
+
+                          <button type="button"
+                            class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/50 px-3 py-2 text-white hover:bg-black/70">
+                            🔇
+                          </button>
+                        </div>
+                      <% end %>
+                    </div>
+
+                  <% else %>
+                    <div data-controller="carousel" class="relative group">
+                      <div data-carousel-target="track" class="flex w-full overflow-hidden scroll-smooth">
+                        <% @post.media.each do |file| %>
+                          <div class="w-full shrink-0" data-slide>
+                            <div class="relative w-full overflow-hidden bg-black aspect-[6/7]">
+                              <% if file.content_type.start_with?("image/") %>
+                                <%= image_tag file, class: "absolute inset-0 h-full w-full object-contain" %>
+                              <% else %>
+                                <div class="video-wrapper absolute inset-0">
+                                  <%= video_tag url_for(file),
+                                    class: "h-full w-full object-contain",
+                                    autoplay: true,
+                                    loop: true,
+                                    muted: true,
+                                    playsinline: true,
+                                    data: { video: true } %>
+
+                                  <button type="button"
+                                    class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/50 px-3 py-2 text-white hover:bg-black/70">
+                                    🔇
+                                  </button>
+                                </div>
+                              <% end %>
+                            </div>
+                          </div>
+                        <% end %>
+                      </div>
+
+                      <button type="button"
+                        data-action="click->carousel#prev"
+                        class="carousel-btn absolute left-3 top-1/2 z-10 -translate-y-1/2
+                              flex h-9 w-9 items-center justify-center
+                              rounded-full bg-black/50 text-white shadow-lg
+                              backdrop-blur
+                              transition-all duration-200 ease-out hover:scale-105 hover:bg-zinc-600/90 active:scale-95
+                              opacity-0 group-hover:opacity-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+
+                      <button type="button"
+                        data-action="click->carousel#next"
+                        class="carousel-btn absolute right-3 top-1/2 z-10 -translate-y-1/2
+                              flex h-9 w-9 items-center justify-center
+                              rounded-full bg-black/50 text-white shadow-lg
+                              backdrop-blur
+                              transition-all duration-200 ease-out hover:scale-105 hover:bg-zinc-600/90 active:scale-95
+                              opacity-0 group-hover:opacity-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+
+                      <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+                        <% @post.media.count.times do |i| %>
+                          <button type="button"
+                            data-carousel-target="dot"
+                            data-action="click->carousel#go"
+                            data-carousel-index-param="<%= i %>"
+                            class="h-2 w-2 rounded-full bg-white opacity-40">
+                          </button>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="flex h-full min-h-0 flex-col">
+                <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <div class="h-9 w-9 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+                      <% if @post.user.avatar.attached? %>
+                        <%= image_tag @post.user.avatar, class: "h-full w-full object-cover" %>
+                      <% else %>
+                        <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
+                      <% end %>
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold">
+                        <%= link_to @post.user.username, public_profile_path(@post.user), class: "hover:underline" %>
+                      </div>
+                      <div class="text-xs text-zinc-400">hace <%= time_ago_in_words(@post.created_at, locale: :es) %></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex-1 min-h-0 overflow-y-auto px-4 py-3 post-comments-scroll">
+                  <% if @post.caption.present? %>
+                    <div class="mb-4 text-sm text-zinc-200">
+                      <span class="font-semibold">
+                        <%= link_to @post.user.username, public_profile_path(@post.user), class: "hover:underline" %>
+                      </span>
+                      <%= render_with_mentions(@post.caption) %>
+                    </div>
+                  <% end %>
+
+                  <div id="comments_list_post_<%= @post.id %>" class="space-y-2 pr-1">
+                    <% @post.comments.order(created_at: :asc).each do |comment| %>
+                      <%= render partial: "comments/comment", locals: { comment: comment } %>
+                    <% end %>
+                  </div>
+                </div>
+
+                <div class="border-t border-white/10 px-4 py-3">
+                  <div class="mb-3 flex items-center gap-3">
+                    <%= render "posts/like_button", post: @post %>
+                    <div class="text-sm text-zinc-400">
+                      <span id="comments_count_post_<%= @post.id %>"><%= @post.comments_count || @post.comments.size %></span> comentarios
+                    </div>
+                  </div>
+
+                  <div id="comment_form_post_<%= @post.id %>">
+                    <%= form_with model: [@post, Comment.new], class: "flex items-center gap-2" do |f| %>
+                      <%= f.text_field :body,
+                        placeholder: "Escribe un comentario...",
+                        class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+
+                      <%= f.submit "Enviar",
+                        class: "rounded-xl bg-white px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 active:scale-[0.99]" %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="sticky top-0 hidden h-screen bg-zinc-950 py-6 pl-6 pr-8 lg:block w-[380px]"></aside>
+    </div>
+  </div>
+</div>

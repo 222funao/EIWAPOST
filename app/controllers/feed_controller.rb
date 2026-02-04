@@ -39,6 +39,7 @@ class FeedController < ApplicationController
         stories: items.map do |story|
           {
             id: story.id,
+            story_url: story_path(story),
             media_url: url_for(story.media),
             media_type: story.media_kind,
             created_at: story.created_at.iso8601,

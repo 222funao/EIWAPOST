@@ -5,7 +5,14 @@ class FollowsController < ApplicationController
   def create
     return head :unprocessable_entity if @user == current_user
 
-    Follow.find_or_create_by!(follower: current_user, followed: @user)
+    follow = Follow.find_or_create_by!(follower: current_user, followed: @user)
+    if follow.previous_changes.key?("id")
+      Notification.create_or_group!(
+        action: "follow",
+        recipient: @user,
+        actor: current_user
+      )
+    end
     respond_to do |format|
       format.turbo_stream
       format.json do

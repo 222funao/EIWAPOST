@@ -8,6 +8,27 @@ class CommentsController < ApplicationController
   @comment.user = current_user
 
   if @comment.save
+    Notification.create_or_group!(
+      action: "comment",
+      recipient: @post.user,
+      actor: current_user,
+      notifiable: @post
+    )
+
+    mentioned = MentionParser.extract_usernames(@comment.body)
+    if mentioned.any?
+      User.where("lower(username) IN (?)", mentioned).find_each do |user|
+        next if user == current_user
+        Notification.create_or_group!(
+          action: "mention",
+          recipient: user,
+          actor: current_user,
+          notifiable: @post,
+          data: { context: "comment", comment_id: @comment.id }
+        )
+      end
+    end
+
     respond_to do |format|
       format.turbo_stream
       format.html { redirect_to root_path }

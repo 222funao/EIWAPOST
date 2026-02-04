@@ -1,8 +1,15 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["modal", "image", "video", "progress", "username", "avatar", "time", "soundToggle", "list"]
-  static values = { stories: Array, imageDuration: Number, currentUserId: Number }
+  static targets = ["modal", "image", "video", "progress", "username", "avatar", "time", "soundToggle", "list", "storyLink"]
+  static values = {
+    stories: Array,
+    imageDuration: Number,
+    currentUserId: Number,
+    startStoryId: Number,
+    autoOpen: Boolean,
+    closeUrl: String
+  }
 
   connect() {
     this._timer = null
@@ -19,6 +26,10 @@ export default class extends Controller {
     this._loadViewed()
     this._applyViewedState()
     this._applyOrdering()
+
+    if (this.autoOpenValue && this.hasStartStoryIdValue) {
+      this._openToStoryId(this.startStoryIdValue)
+    }
   }
 
   open(event) {
@@ -33,6 +44,10 @@ export default class extends Controller {
   close() {
     this._clearTimer()
     this._stopVideo()
+    if (this.hasCloseUrlValue && this.closeUrlValue) {
+      window.location.href = this.closeUrlValue
+      return
+    }
     this.modalTarget.classList.add("hidden")
     document.removeEventListener("keydown", this._onKeydown)
     this._applyOrdering()
@@ -89,6 +104,9 @@ export default class extends Controller {
     this.usernameTarget.textContent = user.username
     this.avatarTarget.src = user.avatar_url
     this.timeTarget.textContent = this._timeAgo(story.created_at)
+    if (this.hasStoryLinkTarget) {
+      this.storyLinkTarget.href = story.story_url || `/stories/${story.id}`
+    }
   }
 
   _renderProgress(group, activeIndex) {
@@ -249,6 +267,26 @@ export default class extends Controller {
     return this.storiesValue.findIndex((group) => group.user.id === userId)
   }
 
+  _indexForStoryId(storyId) {
+    if (!storyId) return null
+    const id = Number(storyId)
+    for (let i = 0; i < this.storiesValue.length; i += 1) {
+      const group = this.storiesValue[i]
+      const idx = group.stories.findIndex((story) => Number(story.id) === id)
+      if (idx >= 0) return { userIndex: i, storyIndex: idx }
+    }
+    return null
+  }
+
+  _openToStoryId(storyId) {
+    const indices = this._indexForStoryId(storyId)
+    if (!indices) return
+    this._muted = false
+    this._show(indices.userIndex, indices.storyIndex)
+    this.modalTarget.classList.remove("hidden")
+    document.addEventListener("keydown", this._onKeydown)
+  }
+
   toggleSound() {
     if (this.videoTarget.classList.contains("hidden")) return
     this._muted = !this._muted
@@ -268,12 +306,12 @@ export default class extends Controller {
     const created = new Date(iso)
     const diff = Math.max(0, Date.now() - created.getTime())
     const seconds = Math.floor(diff / 1000)
-    if (seconds < 60) return `${seconds}s back`
+    if (seconds < 60) return `hace ${seconds}s`
     const minutes = Math.floor(seconds / 60)
-    if (minutes < 60) return `${minutes}m back`
+    if (minutes < 60) return `hace ${minutes}m`
     const hours = Math.floor(minutes / 60)
-    if (hours < 24) return `${hours}h back`
+    if (hours < 24) return `hace ${hours}h`
     const days = Math.floor(hours / 24)
-    return `${days}d back`
+    return `hace ${days}d`
   }
 }

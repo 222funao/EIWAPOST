@@ -5,6 +5,8 @@ class User < ApplicationRecord
   has_many :posts, dependent: :destroy
   has_many :stories, dependent: :destroy
   has_one_attached :avatar
+  has_many :notifications, foreign_key: :recipient_id, dependent: :destroy
+  has_many :sent_notifications, class_name: "Notification", foreign_key: :actor_id, dependent: :nullify
 
   has_many :active_follows, class_name: "Follow", foreign_key: :follower_id, dependent: :destroy
   has_many :passive_follows, class_name: "Follow", foreign_key: :followed_id, dependent: :destroy

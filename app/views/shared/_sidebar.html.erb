@@ -74,17 +74,17 @@
 
       <% end %>
 
-      <%= link_to "#", class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3" do %>
-
-        <span class="text-xl">❤️</span>
-        <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
-             opacity-0 -translate-x-2
-             transition duration-200 ease-out
-             group-hover:opacity-100 group-hover:translate-x-0">
-  Notificaciones
-</span>
-
-      <% end %>
+      <button type="button"
+  data-action="click->notifications-panel#open"
+  class="flex w-full items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3">
+  <span class="text-xl">❤️</span>
+  <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+       opacity-0 -translate-x-2
+       transition duration-200 ease-out
+       group-hover:opacity-100 group-hover:translate-x-0">
+    Notificaciones
+  </span>
+</button>
 
       <%= link_to new_post_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3" do %>
 
@@ -124,3 +124,4 @@
     </div>
   </div>
 </aside>
+

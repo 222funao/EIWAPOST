@@ -9,8 +9,10 @@
         <% end %>
       </span>
       <div class="min-w-0 text-sm leading-snug">
-        <span class="font-semibold text-zinc-200"><%= comment.user.username %></span>
-        <span class="text-zinc-300 break-words"><%= comment.body %></span>
+        <%= link_to comment.user.username,
+          public_profile_path(comment.user),
+          class: "font-semibold text-zinc-200 hover:underline" %>
+        <span class="text-zinc-300 break-words"><%= render_with_mentions(comment.body) %></span>
       </div>
     </div>
   </div>

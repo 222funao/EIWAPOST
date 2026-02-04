@@ -13,6 +13,33 @@ class StoriesController < ApplicationController
     end
   end
 
+  def show
+    Story.cleanup_expired!
+    @story = Story.active.includes(:user, media_attachment: :blob).find(params[:id])
+    user = @story.user
+
+    @stories_data = [
+      {
+        user: {
+          id: user.id,
+          username: user.username,
+          avatar_url: user.avatar.attached? ? url_for(user.avatar) : helpers.asset_path("avatars/default.png"),
+          profile_url: public_profile_path(user)
+        },
+        stories: [
+          {
+            id: @story.id,
+            story_url: story_path(@story),
+            media_url: url_for(@story.media),
+            media_type: @story.media_kind,
+            created_at: @story.created_at.iso8601,
+            expires_at: @story.expires_at.iso8601
+          }
+        ]
+      }
+    ]
+  end
+
   private
 
   def story_params

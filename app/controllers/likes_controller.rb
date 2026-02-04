@@ -3,7 +3,15 @@ class LikesController < ApplicationController
   before_action :set_post
 
   def create
-    @post.likes.find_or_create_by!(user: current_user)
+    like = @post.likes.find_or_create_by!(user: current_user)
+    if like.previous_changes.key?("id")
+      Notification.create_or_group!(
+        action: "like",
+        recipient: @post.user,
+        actor: current_user,
+        notifiable: @post
+      )
+    end
     @post.reload
 
     respond_to do |format|
