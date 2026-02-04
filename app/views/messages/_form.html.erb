@@ -14,15 +14,25 @@
   </div>
 
   <div class="flex items-center gap-2 h-10">
-    <label class="cursor-pointer rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs leading-6 text-zinc-200 hover:bg-white/10">
-      Media
+    <label
+      title="Adjuntar media"
+      class="grid h-10 w-10 cursor-pointer place-items-center rounded-full border border-sky-300/25 bg-gradient-to-br from-sky-500/20 to-cyan-400/10 text-lg text-sky-100 shadow-[0_6px_24px_rgba(14,165,233,0.25)] transition hover:scale-105 hover:from-sky-500/30 hover:to-cyan-400/20">
+      📎
       <%= f.file_field :media,
         multiple: true,
         accept: "image/*,video/*",
+        data: { action: "change->message-form#filesChanged", message_form_target: "fileInput" },
         class: "hidden" %>
     </label>
 
-    <%= f.submit "Enviar",
-      class: "rounded-full bg-sky-500/20 px-4 py-2 text-xs font-semibold leading-6 text-sky-200 hover:bg-sky-500/30" %>
+    <%= f.submit "➤",
+      title: "Enviar mensaje",
+      class: "grid h-10 w-10 place-items-center rounded-full border border-emerald-300/25 bg-gradient-to-br from-emerald-500/25 to-teal-400/15 text-base font-semibold text-emerald-100 shadow-[0_6px_24px_rgba(16,185,129,0.25)] transition hover:scale-105 hover:from-emerald-500/35 hover:to-teal-400/25" %>
+  </div>
+
+  <div
+    data-message-form-target="notice"
+    class="hidden rounded-full border border-emerald-300/25 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">
+    0 archivos listos
   </div>
 <% end %>
