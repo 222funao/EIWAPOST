@@ -130,15 +130,6 @@
                 </div>
 
                 <div class="flex-1 min-h-0 overflow-y-auto px-4 py-3 post-comments-scroll">
-                  <% if @post.caption.present? %>
-                    <div class="mb-4 text-sm text-zinc-200">
-                      <span class="font-semibold">
-                        <%= link_to @post.user.username, public_profile_path(@post.user), class: "hover:underline" %>
-                      </span>
-                      <%= render_with_mentions(@post.caption) %>
-                    </div>
-                  <% end %>
-
                   <div id="comments_list_post_<%= @post.id %>" class="space-y-2 pr-1">
                     <% @post.comments.order(created_at: :asc).each do |comment| %>
                       <%= render partial: "comments/comment", locals: { comment: comment } %>
@@ -147,10 +138,17 @@
                 </div>
 
                 <div class="border-t border-white/10 px-4 py-3">
-                  <div class="mb-3 flex items-center gap-3">
-                    <%= render "posts/like_button", post: @post %>
-                    <div class="text-sm text-zinc-400">
-                      <span id="comments_count_post_<%= @post.id %>"><%= @post.comments_count || @post.comments.size %></span> comentarios
+                  <div class="mb-3 flex items-center justify-between gap-3">
+                    <div class="min-w-0 text-sm text-zinc-200">
+                      <% if @post.caption.present? %>
+                        <span class="font-semibold">
+                          <%= link_to @post.user.username, public_profile_path(@post.user), class: "hover:underline" %>
+                        </span>
+                        <%= render_with_mentions(@post.caption) %>
+                      <% end %>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                      <%= render "posts/like_button", post: @post %>
                     </div>
                   </div>
 

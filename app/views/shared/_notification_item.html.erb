@@ -1,7 +1,7 @@
 <div class="flex items-center justify-between gap-3 rounded-xl px-2 py-2 hover:bg-white/5">
   <div class="flex items-center gap-3 min-w-0">
     <% if notification.actor&.avatar&.attached? %>
-      <%= image_tag notification.actor.avatar, class: "h-9 w-9 rounded-full object-cover ring-1 ring-white/10" %>
+      <%= image_tag rails_blob_path(notification.actor.avatar, only_path: true), class: "h-9 w-9 rounded-full object-cover ring-1 ring-white/10" %>
     <% else %>
       <%= image_tag "avatars/default.png", class: "h-9 w-9 rounded-full object-cover ring-1 ring-white/10" %>
     <% end %>

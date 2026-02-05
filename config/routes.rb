@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount ActionCable.server => "/cable"
+
   get "/profiles/:id", to: "profiles#show", as: :public_profile
 
   # ✅ tu perfil (sin id)

@@ -38,10 +38,18 @@ module NotificationsHelper
     return nil unless media
 
     link_to post_path(post), class: "shrink-0" do
+      blob_path = rails_blob_path(media, only_path: true)
       if media.content_type&.start_with?("image/")
-        image_tag media, class: "h-12 w-12 rounded-lg object-cover"
+        image_tag blob_path, class: "h-12 w-12 rounded-lg object-cover"
       else
-        content_tag(:div, "VIDEO", class: "h-12 w-12 rounded-lg bg-zinc-800 text-[10px] text-zinc-300 flex items-center justify-center")
+        content_tag(:div, class: "relative h-12 w-12 overflow-hidden rounded-lg bg-black") do
+          safe_join(
+            [
+              video_tag(blob_path, class: "h-full w-full object-cover", muted: true, playsinline: true),
+              content_tag(:span, "", class: "absolute inset-0 bg-black/20")
+            ]
+          )
+        end
       end
     end
   end

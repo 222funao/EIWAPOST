@@ -1,4 +1,4 @@
-<div data-notifications-panel-target="modal" class="hidden fixed inset-0 z-[110]">
+<div id="notifications_panel" data-notifications-panel-target="modal" class="hidden fixed inset-0 z-[110]">
   <div data-action="click->notifications-panel#close"
        class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
@@ -13,45 +13,8 @@
       </button>
     </div>
 
-    <div class="h-full overflow-y-auto px-4 pb-6 pt-4">
-      <% if @notifications.blank? %>
-        <div class="py-10 text-center text-sm text-zinc-500">No hay notificaciones.</div>
-      <% else %>
-        <% now = Time.current %>
-        <% today_start = now.beginning_of_day %>
-        <% recent_cutoff = 5.days.ago.beginning_of_day %>
-
-        <% today_items = @notifications.select { |n| (n.updated_at || n.created_at) >= today_start } %>
-        <% recent_items = @notifications.select { |n| (n.updated_at || n.created_at) < today_start && (n.updated_at || n.created_at) >= recent_cutoff } %>
-        <% old_items = @notifications.select { |n| (n.updated_at || n.created_at) < recent_cutoff } %>
-
-        <% if today_items.any? %>
-          <div class="mb-3 text-xs font-semibold text-zinc-400">Hoy</div>
-          <div class="space-y-3 mb-6">
-            <% today_items.each do |notification| %>
-              <%= render partial: "shared/notification_item", locals: { notification: notification } %>
-            <% end %>
-          </div>
-        <% end %>
-
-        <% if recent_items.any? %>
-          <div class="mb-3 text-xs font-semibold text-zinc-400">Recientes</div>
-          <div class="space-y-3 mb-6">
-            <% recent_items.each do |notification| %>
-              <%= render partial: "shared/notification_item", locals: { notification: notification } %>
-            <% end %>
-          </div>
-        <% end %>
-
-        <% if old_items.any? %>
-          <div class="mb-3 text-xs font-semibold text-zinc-400">Antiguos</div>
-          <div class="space-y-3">
-            <% old_items.each do |notification| %>
-              <%= render partial: "shared/notification_item", locals: { notification: notification } %>
-            <% end %>
-          </div>
-        <% end %>
-      <% end %>
+    <div id="notifications_panel_content" class="h-full overflow-y-auto px-4 pb-6 pt-4">
+      <%= render partial: "shared/notifications_panel_content", locals: { notifications: local_assigns.fetch(:notifications, @notifications) } %>
     </div>
   </div>
 </div>

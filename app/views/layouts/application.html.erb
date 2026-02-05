@@ -9,6 +9,7 @@
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%= action_cable_meta_tag %>
     <!-- Tailwind / CSS -->
   <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
@@ -18,6 +19,9 @@
   <body class="min-h-screen w-full bg-zinc-950 overflow-x-hidden"
         data-controller="user-search notifications-panel"
         data-user-search-posts-url-value="<%= feed_path %>">
+    <% if user_signed_in? %>
+      <%= turbo_stream_from(*Notification.stream_for(current_user)) %>
+    <% end %>
     <%= yield %>
     <%= render "shared/user_search_modal" %>
     <%= render "shared/notifications_panel" %>

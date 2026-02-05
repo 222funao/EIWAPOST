@@ -10,6 +10,10 @@ class Notification < ApplicationRecord
   scope :for_user, ->(user) { where(recipient: user) }
   scope :recent_first, -> { order(Arel.sql("COALESCE(updated_at, created_at) DESC")) }
 
+  def self.stream_for(user)
+    [user, :notifications]
+  end
+
   def self.create_or_group!(action:, recipient:, actor:, notifiable: nil, data: {})
     return if recipient == actor
 
@@ -20,17 +24,37 @@ class Notification < ApplicationRecord
                  .first
       if existing
         existing.update!(actor: actor, group_count: existing.group_count + 1)
+        existing.broadcast_panel
         return existing
       end
     end
 
-    create!(
+    notification = create!(
       recipient: recipient,
       actor: actor,
       action: action,
       notifiable: notifiable,
       group_count: 1,
       data: data
+    )
+    notification.broadcast_panel
+    notification
+  end
+
+  def broadcast_panel
+    return unless recipient
+
+    notifications = Notification
+      .for_user(recipient)
+      .recent_first
+      .limit(40)
+      .includes(:actor, :notifiable)
+
+    broadcast_update_to(
+      *Notification.stream_for(recipient),
+      target: "notifications_panel_content",
+      partial: "shared/notifications_panel_content",
+      locals: { notifications: notifications }
     )
   end
 end
