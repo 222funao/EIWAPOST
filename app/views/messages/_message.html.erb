@@ -31,6 +31,7 @@
     <% if message.media.attached? %>
       <% media_images = message.media.select { |m| m.content_type&.start_with?("image/") } %>
       <% media_videos = message.media.select { |m| m.content_type&.start_with?("video/") } %>
+      <% media_audios = message.media.select { |m| m.content_type&.start_with?("audio/") } %>
 
       <% if media_images.any? %>
         <div class="mt-3 flex flex-wrap gap-2">
@@ -68,6 +69,52 @@
                 VIDEO
               </span>
             </button>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if media_audios.any? %>
+        <div class="mt-3 flex flex-col gap-2">
+          <% media_audios.each do |aud| %>
+            <div
+              data-controller="message-audio"
+              class="w-[420px] max-w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 sm:w-[300px]">
+              <audio
+                data-message-audio-target="audio"
+                data-type="<%= aud.content_type %>"
+                preload="metadata"
+                class="hidden">
+                <source src="<%= url_for(aud) %>" type="<%= aud.content_type %>">
+              </audio>
+              <div class="flex items-center gap-3">
+                <button
+                  type="button"
+                  data-action="click->message-audio#toggle"
+                  data-message-audio-target="playButton"
+                  aria-pressed="false"
+                  class="grid h-9 w-12 place-items-center rounded-full border border-emerald-300/25 bg-gradient-to-br from-emerald-500/25 to-teal-400/15 text-xs font-semibold uppercase tracking-wide text-emerald-100 shadow-[0_6px_20px_rgba(16,185,129,0.2)] transition hover:scale-105 hover:from-emerald-500/35 hover:to-teal-400/25">
+                  Play
+                </button>
+                <div class="flex-1">
+                  <div
+                    data-action="click->message-audio#seek"
+                    class="relative h-2 w-full cursor-pointer overflow-hidden rounded-full bg-white/10">
+                    <div
+                      data-message-audio-target="progressFill"
+                      class="absolute inset-y-0 left-0 w-0 rounded-full bg-emerald-400/80"></div>
+                  </div>
+                  <div class="mt-1 flex items-center justify-between text-[10px] text-white/60">
+                    <span data-message-audio-target="currentTime">0:00</span>
+                    <span data-message-audio-target="duration">0:00</span>
+                  </div>
+                </div>
+              </div>
+              <div
+                data-message-audio-target="status"
+                class="mt-2 hidden text-[10px] text-rose-200">
+                Audio no compatible
+              </div>
+            </div>
           <% end %>
         </div>
       <% end %>

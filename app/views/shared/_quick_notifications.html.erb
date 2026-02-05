@@ -1,7 +1,8 @@
 <div data-controller="quick-notifications"
-     class="fixed bottom-6 right-6 z-[120]">
+     data-action="pointermove->quick-notifications#drag pointerup->quick-notifications#endDrag pointercancel->quick-notifications#endDrag"
+     class="fixed bottom-6 right-6 z-[120] touch-none">
   <button type="button"
-          data-action="click->quick-notifications#toggle"
+          data-action="pointerdown->quick-notifications#startDrag pointerup->quick-notifications#endDrag pointercancel->quick-notifications#endDrag"
           data-quick-notifications-target="button"
           class="relative flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900/90 text-white shadow-lg ring-1 ring-white/10 backdrop-blur hover:bg-zinc-800">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

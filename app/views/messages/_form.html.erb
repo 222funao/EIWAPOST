@@ -25,6 +25,16 @@
         class: "hidden" %>
     </label>
 
+    <button
+      type="button"
+      title="Grabar audio"
+      aria-pressed="false"
+      data-action="click->message-form#toggleRecording"
+      data-message-form-target="recordButton"
+      class="grid h-10 w-10 place-items-center rounded-full border border-rose-500/20 bg-gradient-to-br from-rose-500/20 to-fuchsia-500/10 text-[10px] font-semibold uppercase tracking-wide text-rose-100 shadow-[0_6px_24px_rgba(244,63,94,0.25)] transition hover:scale-105 hover:from-rose-500/30 hover:to-fuchsia-500/20">
+      Rec
+    </button>
+
     <%= f.submit "➤",
       title: "Enviar mensaje",
       class: "grid h-10 w-10 place-items-center rounded-full border border-emerald-300/25 bg-gradient-to-br from-emerald-500/25 to-teal-400/15 text-base font-semibold text-emerald-100 shadow-[0_6px_24px_rgba(16,185,129,0.25)] transition hover:scale-105 hover:from-emerald-500/35 hover:to-teal-400/25" %>
@@ -34,5 +44,11 @@
     data-message-form-target="notice"
     class="hidden rounded-full border border-emerald-300/25 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">
     0 archivos listos
+  </div>
+
+  <div
+    data-message-form-target="recordStatus"
+    class="hidden rounded-full border border-rose-500/20 bg-rose-500/10 px-3 py-1 text-xs text-rose-100">
+    Grabacion de audio lista
   </div>
 <% end %>

@@ -6,6 +6,10 @@ export default class extends Controller {
   connect() {
     this._open = false
     this._lastId = this._currentTopId()
+    this._dragging = false
+    this._offset = { x: 0, y: 0 }
+    this._dragMoved = false
+    this._dragStart = { x: 0, y: 0 }
     this._observer = new MutationObserver(() => this._handleListChange())
     if (this.hasListTarget) {
       this._observer.observe(this.listTarget, { childList: true, subtree: false })
@@ -19,7 +23,49 @@ export default class extends Controller {
   }
 
   toggle() {
+    if (this._dragMoved) {
+      this._dragMoved = false
+      return
+    }
     this._open ? this._closePanel() : this._openPanel()
+  }
+
+  startDrag(event) {
+    if (event.button !== 0) return
+    this._dragging = true
+    this._dragMoved = false
+    this._dragStart = { x: event.clientX, y: event.clientY }
+    const rect = this.element.getBoundingClientRect()
+    this._offset = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    }
+    this.element.classList.add("select-none")
+    this.element.setPointerCapture(event.pointerId)
+  }
+
+  drag(event) {
+    if (!this._dragging) return
+    const deltaX = Math.abs(event.clientX - this._dragStart.x)
+    const deltaY = Math.abs(event.clientY - this._dragStart.y)
+    if (deltaX + deltaY < 6) return
+    this._dragMoved = true
+    const x = event.clientX - this._offset.x
+    const y = event.clientY - this._offset.y
+    this.element.style.left = `${Math.max(8, x)}px`
+    this.element.style.top = `${Math.max(8, y)}px`
+    this.element.style.right = "auto"
+    this.element.style.bottom = "auto"
+  }
+
+  endDrag(event) {
+    if (!this._dragging) return
+    this._dragging = false
+    this.element.classList.remove("select-none")
+    this.element.releasePointerCapture(event.pointerId)
+    if (!this._dragMoved) {
+      this.toggle()
+    }
   }
 
   _handleListChange() {
