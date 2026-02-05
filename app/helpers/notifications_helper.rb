@@ -2,24 +2,28 @@ module NotificationsHelper
   def notification_message(notification)
     action = notification.action
     actor = notification.actor
-    if notification.group_count.to_i > 1 && %w[like comment].include?(action)
-      return action == "like" ? "Varias personas dieron like a tu post" : "Varias personas comentaron tu post"
+    if notification.group_count.to_i > 1 && %w[like comment story_like].include?(action)
+      return action == "like" ? "Varias personas dieron like a tu post" : (action == "story_like" ? "Varias personas dieron like a tu historia" : "Varias personas comentaron tu post")
     end
 
-    return "Te empezó a seguir" unless actor
+    return "Te empezo a seguir" unless actor
 
     case action
     when "follow"
-      "comenzó a seguirte"
+      "comenzo a seguirte"
     when "like"
       "dio like a tu post"
+    when "story_like"
+      "dio like a tu historia"
     when "comment"
-      "comentó tu post"
+      "comento tu post"
+    when "story_reply"
+      "respondio tu historia"
     when "mention"
       context = notification.data["context"]
-      context == "comment" ? "te mencionó en un comentario" : "te mencionó en un post"
+      context == "comment" ? "te menciono en un comentario" : "te menciono en un post"
     else
-      "tienes una notificación"
+      "tienes una notificacion"
     end
   end
 
@@ -31,15 +35,33 @@ module NotificationsHelper
   end
 
   def notification_post_preview(notification)
-    post = notification.notifiable
-    return nil unless post.is_a?(Post)
+    item = notification.notifiable
+    return nil unless item.is_a?(Post) || item.is_a?(Story)
 
-    media = post.media.first
+    media =
+      if item.is_a?(Post)
+        item.media.first
+      else
+        item.media if item.media.attached?
+      end
     return nil unless media
 
-    link_to post_path(post), class: "shrink-0" do
+    destination =
+      if item.is_a?(Post)
+        post_path(item)
+      else
+        notification.data["story_url"].presence || story_path(item)
+      end
+
+    link_to destination, class: "shrink-0" do
       blob_path = rails_blob_path(media, only_path: true)
-      if media.content_type&.start_with?("image/")
+      content_type =
+        if media.respond_to?(:content_type)
+          media.content_type
+        else
+          media.blob&.content_type
+        end
+      if content_type&.start_with?("image/")
         image_tag blob_path, class: "h-12 w-12 rounded-lg object-cover"
       else
         content_tag(:div, class: "relative h-12 w-12 overflow-hidden rounded-lg bg-black") do

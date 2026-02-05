@@ -8,9 +8,9 @@ class MessagesController < ApplicationController
     if @active_user
       @conversation = Conversation.find_or_create_between!(current_user, @active_user)
       @messages =
-        @conversation
+      @conversation
           .messages
-          .includes(:sender, media_attachments: :blob)
+          .includes(:sender, :story, story: { media_attachment: :blob }, media_attachments: :blob)
           .order(:created_at)
     else
       @conversation = nil
@@ -24,8 +24,10 @@ class MessagesController < ApplicationController
 
     @conversation = Conversation.find_or_create_between!(current_user, @active_user)
     @message = @conversation.messages.new(message_params.merge(sender: current_user))
+    attach_story_reply
 
     if @message.save
+      notify_story_reply(@message)
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to messages_path(user_id: @active_user.id) }
@@ -55,6 +57,33 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.require(:message).permit(:body, media: [])
+    params.require(:message).permit(:body, :story_id, media: [])
+  end
+
+  def notify_story_reply(message)
+    story_id = params[:story_id]
+    return if story_id.blank?
+
+    story = Story.find_by(id: story_id)
+    return unless story
+
+    Notification.create_or_group!(
+      action: "story_reply",
+      recipient: story.user,
+      actor: current_user,
+      notifiable: story,
+      data: { story_url: story_path(story) }
+    )
+  end
+
+  def attach_story_reply
+    story_id = params[:story_id] || params.dig(:message, :story_id)
+    return if story_id.blank?
+
+    story = Story.active.find_by(id: story_id)
+    return unless story
+    return unless story.user_id == @active_user.id
+
+    @message.story = story
   end
 end

@@ -2,6 +2,28 @@
 <div class="flex <%= is_me ? "justify-end" : "justify-start" %>">
   <div class="<%= is_me ? "bg-sky-500/15 text-sky-100" : "bg-white/10 text-zinc-100" %>
               inline-flex flex-col max-w-[100%] rounded-2xl px-4 py-3">
+    <% if message.story&.media&.attached? %>
+      <% story_media = message.story.media %>
+      <div class="mb-2 flex items-center gap-3 rounded-2xl bg-black/30 p-2">
+        <%= link_to story_path(message.story), class: "relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-black" do %>
+          <% if story_media.image? %>
+            <%= image_tag story_media, class: "h-full w-full object-cover" %>
+          <% else %>
+            <%= video_tag url_for(story_media), class: "h-full w-full object-cover", muted: true, playsinline: true %>
+            <span class="pointer-events-none absolute inset-0 bg-black/20"></span>
+          <% end %>
+        <% end %>
+        <div class="min-w-0 text-xs text-white/80">
+          <div class="truncate">
+            <%= is_me ? "Respondiste a su historia" : "Respondió a tu historia" %>
+          </div>
+          <% if message.story.description.present? %>
+            <div class="truncate text-white/60"><%= message.story.description %></div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <% if message.body.present? %>
       <div class="text-sm leading-relaxed"><%= message.body %></div>
     <% end %>

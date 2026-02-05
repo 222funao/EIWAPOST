@@ -95,6 +95,18 @@
               </div>
             </div>
 
+            <div>
+              <%= f.label :description, "Descripcion", class: "mb-2 block text-sm text-zinc-300" %>
+              <%= f.text_area :description,
+                    rows: 2,
+                    maxlength: 140,
+                    placeholder: "Agrega una descripcion corta...",
+                    class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+              <div class="mt-2 text-xs text-zinc-500">
+                Maximo 140 caracteres.
+              </div>
+            </div>
+
             <div class="flex items-center gap-3">
               <%= f.submit "Subir historia",
                     class: "w-full rounded-xl bg-white px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 active:scale-[0.99]" %>

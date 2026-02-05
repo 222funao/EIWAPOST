@@ -25,7 +25,9 @@ Rails.application.routes.draw do
     resources :users, only: [:show]
     resource :like, only: [:create, :destroy]
   end
-  resources :stories, only: [:create, :show]
+  resources :stories, only: [:create, :show] do
+    resource :like, only: [:create, :destroy], controller: "story_likes"
+  end
 
   devise_for :users
 

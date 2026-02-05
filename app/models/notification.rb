@@ -17,7 +17,7 @@ class Notification < ApplicationRecord
   def self.create_or_group!(action:, recipient:, actor:, notifiable: nil, data: {})
     return if recipient == actor
 
-    if %w[like comment].include?(action) && notifiable.present?
+    if %w[like comment story_like].include?(action) && notifiable.present?
       existing = where(recipient: recipient, action: action, notifiable: notifiable)
                  .where("updated_at >= ?", GROUP_WINDOW.ago)
                  .order(updated_at: :desc)

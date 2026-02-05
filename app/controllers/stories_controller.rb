@@ -24,7 +24,8 @@ class StoriesController < ApplicationController
           id: user.id,
           username: user.username,
           avatar_url: user.avatar.attached? ? url_for(user.avatar) : helpers.asset_path("avatars/default.png"),
-          profile_url: public_profile_path(user)
+          profile_url: public_profile_path(user),
+          can_reply: current_user.friends_with?(user)
         },
         stories: [
           {
@@ -32,6 +33,8 @@ class StoriesController < ApplicationController
             story_url: story_path(@story),
             media_url: url_for(@story.media),
             media_type: @story.media_kind,
+            description: @story.description,
+            liked: StoryLike.exists?(user_id: current_user.id, story_id: @story.id),
             created_at: @story.created_at.iso8601,
             expires_at: @story.expires_at.iso8601
           }
@@ -43,6 +46,6 @@ class StoriesController < ApplicationController
   private
 
   def story_params
-    params.require(:story).permit(:media)
+    params.require(:story).permit(:media, :description)
   end
 end

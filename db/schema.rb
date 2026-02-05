@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_04_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_05_092000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -86,9 +86,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_04_090000) do
     t.bigint "conversation_id", null: false
     t.datetime "created_at", null: false
     t.bigint "sender_id", null: false
+    t.bigint "story_id"
     t.datetime "updated_at", null: false
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["sender_id"], name: "index_messages_on_sender_id"
+    t.index ["story_id"], name: "index_messages_on_story_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -261,11 +263,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_04_090000) do
 
   create_table "stories", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "description"
     t.datetime "expires_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["expires_at"], name: "index_stories_on_expires_at"
     t.index ["user_id"], name: "index_stories_on_user_id"
+  end
+
+  create_table "story_likes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "story_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["story_id"], name: "index_story_likes_on_story_id"
+    t.index ["user_id", "story_id"], name: "index_story_likes_on_user_id_and_story_id", unique: true
+    t.index ["user_id"], name: "index_story_likes_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -297,6 +310,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_04_090000) do
   add_foreign_key "likes", "posts"
   add_foreign_key "likes", "users"
   add_foreign_key "messages", "conversations"
+  add_foreign_key "messages", "stories"
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "notifications", "users", column: "actor_id"
   add_foreign_key "notifications", "users", column: "recipient_id"
@@ -308,4 +322,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_04_090000) do
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "stories", "users"
+  add_foreign_key "story_likes", "stories"
+  add_foreign_key "story_likes", "users"
 end

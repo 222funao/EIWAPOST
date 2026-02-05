@@ -1,8 +1,10 @@
 class Story < ApplicationRecord
   belongs_to :user
   has_one_attached :media
+  has_many :story_likes, dependent: :destroy
 
   validates :media, presence: true
+  validates :description, presence: true, length: { maximum: 140 }
   validate :media_type_allowed
 
   scope :active, -> { where("expires_at > ?", Time.current) }

@@ -1,14 +1,36 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["modal", "image", "video", "progress", "username", "avatar", "time", "soundToggle", "list", "storyLink"]
+  static targets = [
+    "modal",
+    "image",
+    "video",
+    "progress",
+    "username",
+    "avatar",
+    "time",
+    "soundToggle",
+    "list",
+    "storyLink",
+    "description",
+    "replyForm",
+    "replyInput",
+    "replyIndicator",
+    "pauseToggle",
+    "likeButton",
+    "likeIcon",
+    "likeIconFilled",
+    "replyStoryId"
+  ]
   static values = {
     stories: Array,
     imageDuration: Number,
     currentUserId: Number,
     startStoryId: Number,
     autoOpen: Boolean,
-    closeUrl: String
+    closeUrl: String,
+    messagesPathTemplate: String,
+    storyLikePathTemplate: String
   }
 
   connect() {
@@ -16,6 +38,10 @@ export default class extends Controller {
     this._currentUserIndex = 0
     this._currentStoryIndex = 0
     this._muted = false
+    this._paused = false
+    this._timerStartedAt = null
+    this._timerRemainingMs = null
+    this._likedOverrides = new Map()
     this._viewedIds = new Set()
     this._onKeydown = (e) => {
       if (e.key === "Escape") this.close()
@@ -44,6 +70,7 @@ export default class extends Controller {
   close() {
     this._clearTimer()
     this._stopVideo()
+    this._paused = false
     if (this.hasCloseUrlValue && this.closeUrlValue) {
       window.location.href = this.closeUrlValue
       return
@@ -94,9 +121,14 @@ export default class extends Controller {
     if (!group) return this.close()
 
     const story = group.stories[storyIndex]
+    this._currentStoryId = story.id
     this._renderHeader(group.user, story)
+    this._renderDescription(story)
+    this._renderReply(group.user)
+    this._renderLike(story)
     this._renderProgress(group, storyIndex)
     this._renderMedia(story)
+    this._setPauseButtonState()
     this._markViewed(group.user.id)
   }
 
@@ -106,6 +138,57 @@ export default class extends Controller {
     this.timeTarget.textContent = this._timeAgo(story.created_at)
     if (this.hasStoryLinkTarget) {
       this.storyLinkTarget.href = story.story_url || `/stories/${story.id}`
+    }
+  }
+
+  _renderLike(story) {
+    if (!this.hasLikeButtonTarget) return
+    this._currentStoryId = story.id
+    const override = this._likedOverrides.get(Number(story.id))
+    const liked = override === undefined ? Boolean(story.liked) : override
+    this.likeButtonTarget.classList.toggle("text-rose-400", liked)
+    this.likeButtonTarget.classList.toggle("text-white/90", !liked)
+    this.likeButtonTarget.dataset.liked = liked ? "true" : "false"
+    if (this.hasLikeIconTarget) {
+      this.likeIconTarget.classList.toggle("hidden", liked)
+    }
+    if (this.hasLikeIconFilledTarget) {
+      this.likeIconFilledTarget.classList.toggle("hidden", !liked)
+    }
+  }
+
+  _renderDescription(story) {
+    if (!this.hasDescriptionTarget) return
+    const text = (story.description || "").trim()
+    if (text.length > 0) {
+      this.descriptionTarget.textContent = text
+      this.descriptionTarget.classList.remove("hidden")
+    } else {
+      this.descriptionTarget.textContent = ""
+      this.descriptionTarget.classList.add("hidden")
+    }
+  }
+
+  _renderReply(user) {
+    if (!this.hasReplyFormTarget || !this.hasReplyInputTarget) return
+    this._replyUserId = user.id
+    const canReply = Boolean(user.can_reply)
+    this.replyInputTarget.value = ""
+    this.replyInputTarget.disabled = !canReply
+    this.replyFormTarget.classList.toggle("opacity-60", !canReply)
+    this.replyFormTarget.classList.toggle("pointer-events-none", !canReply)
+    this.replyInputTarget.placeholder = canReply
+      ? `Responder a ${user.username}...`
+      : "Solo amigos pueden responder"
+    if (this.hasReplyIndicatorTarget) {
+      this.replyIndicatorTarget.classList.add("opacity-0", "scale-75")
+      this.replyIndicatorTarget.classList.remove("opacity-100", "scale-100")
+    }
+    if (this.hasMessagesPathTemplateValue && this.messagesPathTemplateValue) {
+      this.replyFormTarget.action = this._messagePathFor(user.id)
+    }
+    if (this.hasReplyStoryIdTarget) {
+      this.replyStoryIdTarget.value = this._currentStoryId || ""
     }
   }
 
@@ -135,6 +218,7 @@ export default class extends Controller {
   _renderMedia(story) {
     this._clearTimer()
     this._stopVideo()
+    this._paused = false
 
     if (story.media_type === "video") {
       this.imageTarget.classList.add("hidden")
@@ -161,6 +245,8 @@ export default class extends Controller {
   }
 
   _startTimer(durationMs) {
+    this._timerRemainingMs = durationMs
+    this._timerStartedAt = Date.now()
     const bar = this._progressBars?.[this._currentStoryIndex]
     if (bar) {
       bar.style.transition = "none"
@@ -179,6 +265,8 @@ export default class extends Controller {
       window.clearTimeout(this._timer)
       this._timer = null
     }
+    this._timerStartedAt = null
+    this._timerRemainingMs = null
   }
 
   _stopVideo() {
@@ -300,6 +388,70 @@ export default class extends Controller {
     this.soundToggleTarget.textContent = this._muted ? "🔇" : "🔊"
     this.soundToggleTarget.classList.toggle("opacity-40", !isVideo)
     this.soundToggleTarget.classList.toggle("cursor-not-allowed", !isVideo)
+    this.soundToggleTarget.classList.toggle("hidden", !isVideo)
+  }
+
+  togglePause() {
+    if (this._paused) {
+      this._resumePlayback()
+    } else {
+      this._pausePlayback()
+    }
+  }
+
+  _pausePlayback() {
+    if (this._paused) return
+    this._paused = true
+    this._pauseTimer()
+    if (!this.videoTarget.classList.contains("hidden")) {
+      this.videoTarget.pause()
+    }
+    this._setPauseButtonState()
+  }
+
+  _resumePlayback() {
+    if (!this._paused) return
+    this._paused = false
+    this._resumeTimer()
+    if (!this.videoTarget.classList.contains("hidden")) {
+      this.videoTarget.play().catch(() => {})
+    }
+    this._setPauseButtonState()
+  }
+
+  _pauseTimer() {
+    if (!this._timer) return
+    if (this._timerStartedAt) {
+      const elapsed = Date.now() - this._timerStartedAt
+      this._timerRemainingMs = Math.max(0, (this._timerRemainingMs || 0) - elapsed)
+    }
+    window.clearTimeout(this._timer)
+    this._timer = null
+
+    const bar = this._progressBars?.[this._currentStoryIndex]
+    if (bar) {
+      const computed = window.getComputedStyle(bar).width
+      bar.style.transition = "none"
+      bar.style.width = computed
+    }
+  }
+
+  _resumeTimer() {
+    if (!this._timerRemainingMs || this._timerRemainingMs <= 0) return this.next()
+    const bar = this._progressBars?.[this._currentStoryIndex]
+    if (bar) {
+      requestAnimationFrame(() => {
+        bar.style.transition = `width ${this._timerRemainingMs}ms linear`
+        bar.style.width = "100%"
+      })
+    }
+    this._timerStartedAt = Date.now()
+    this._timer = window.setTimeout(() => this.next(), this._timerRemainingMs)
+  }
+
+  _setPauseButtonState() {
+    if (!this.hasPauseToggleTarget) return
+    this.pauseToggleTarget.textContent = this._paused ? "▶" : "⏸"
   }
 
   _timeAgo(iso) {
@@ -314,4 +466,107 @@ export default class extends Controller {
     const days = Math.floor(hours / 24)
     return `hace ${days}d`
   }
+
+  submitReply(event) {
+    if (!this.hasReplyInputTarget || !this.hasReplyFormTarget) return
+    event.preventDefault()
+    if (this.replyInputTarget.disabled) return
+    const body = this.replyInputTarget.value.trim()
+    if (!body) return
+
+    const formData = new FormData(this.replyFormTarget)
+    formData.set("message[body]", body)
+    if (this._currentStoryId) {
+      formData.set("story_id", String(this._currentStoryId))
+    }
+
+    fetch(this.replyFormTarget.action, {
+      method: "POST",
+      headers: {
+        Accept: "text/vnd.turbo-stream.html",
+        "X-CSRF-Token": this._csrfToken()
+      },
+      body: formData,
+      credentials: "same-origin"
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        this.replyInputTarget.value = ""
+        this._showReplyIndicator()
+      })
+      .catch(() => {
+        this._showReplyIndicator(true)
+      })
+  }
+
+  _showReplyIndicator(isError = false) {
+    if (!this.hasReplyIndicatorTarget) return
+    this.replyIndicatorTarget.classList.remove("opacity-0", "scale-75")
+    this.replyIndicatorTarget.classList.add("opacity-100", "scale-100")
+    this.replyIndicatorTarget.classList.toggle("bg-rose-500/80", isError)
+    this.replyIndicatorTarget.classList.toggle("bg-emerald-400/80", !isError)
+    window.clearTimeout(this._replyNoticeTimer)
+    this._replyNoticeTimer = window.setTimeout(() => {
+      this.replyIndicatorTarget.classList.add("opacity-0", "scale-75")
+      this.replyIndicatorTarget.classList.remove("opacity-100", "scale-100")
+    }, 1200)
+  }
+
+  _messagePathFor(userId) {
+    if (!this.hasMessagesPathTemplateValue) return `/messages/${userId}`
+    return this.messagesPathTemplateValue.replace("USER_ID", String(userId))
+  }
+
+  _storyLikePathFor(storyId) {
+    if (!this.hasStoryLikePathTemplateValue) return `/stories/${storyId}/like`
+    return this.storyLikePathTemplateValue.replace("STORY_ID", String(storyId))
+  }
+
+  _csrfToken() {
+    const meta = document.querySelector("meta[name='csrf-token']")
+    return meta?.content || ""
+  }
+
+  toggleLike() {
+    if (!this.hasLikeButtonTarget || !this._currentStoryId) return
+    const storyId = this._currentStoryId
+    const liked = this.likeButtonTarget.dataset.liked === "true"
+    const method = liked ? "DELETE" : "POST"
+    const nextLiked = !liked
+    this._likedOverrides.set(Number(storyId), nextLiked)
+    this._renderLike({ id: storyId, liked: nextLiked })
+    fetch(this._storyLikePathFor(storyId), {
+      method,
+      headers: {
+        Accept: "application/json",
+        "X-CSRF-Token": this._csrfToken()
+      },
+      credentials: "same-origin"
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        this._syncStoryLikeState(storyId, nextLiked)
+      })
+      .catch(() => {
+        this._likedOverrides.delete(Number(storyId))
+        this._renderLike(this._findStoryById(storyId) || { id: storyId, liked })
+      })
+  }
+
+  _syncStoryLikeState(storyId, liked) {
+    this.storiesValue.forEach((group) => {
+      const story = group.stories?.find((item) => Number(item.id) === Number(storyId))
+      if (story) story.liked = liked
+    })
+  }
+
+  _findStoryById(storyId) {
+    for (const group of this.storiesValue || []) {
+      const story = group.stories?.find((item) => Number(item.id) === Number(storyId))
+      if (story) return story
+    }
+    return null
+  }
 }
+
+

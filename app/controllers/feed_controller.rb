@@ -16,12 +16,14 @@ class FeedController < ApplicationController
     @posts = @posts.order(created_at: :desc)
 
     following_ids = (current_user.following_ids + [current_user.id]).uniq
+    friend_ids = current_user.friend_ids
     stories = Story.active
                    .includes(:user, media_attachment: :blob)
                    .where(user_id: following_ids)
                    .order(created_at: :asc)
 
     @story_groups = stories.group_by(&:user)
+    liked_story_ids = StoryLike.where(user_id: current_user.id, story_id: stories.map(&:id)).pluck(:story_id)
     if @story_groups.key?(current_user)
       current_group = @story_groups[current_user]
       @story_groups = @story_groups.except(current_user)
@@ -34,7 +36,8 @@ class FeedController < ApplicationController
           id: user.id,
           username: user.username,
           avatar_url: user.avatar.attached? ? url_for(user.avatar) : helpers.asset_path("avatars/default.png"),
-          profile_url: public_profile_path(user)
+          profile_url: public_profile_path(user),
+          can_reply: friend_ids.include?(user.id)
         },
         stories: items.map do |story|
           {
@@ -42,6 +45,8 @@ class FeedController < ApplicationController
             story_url: story_path(story),
             media_url: url_for(story.media),
             media_type: story.media_kind,
+            description: story.description,
+            liked: liked_story_ids.include?(story.id),
             created_at: story.created_at.iso8601,
             expires_at: story.expires_at.iso8601
           }
