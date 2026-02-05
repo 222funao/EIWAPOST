@@ -25,5 +25,8 @@
     <%= yield %>
     <%= render "shared/user_search_modal" %>
     <%= render "shared/notifications_panel" %>
+    <% if user_signed_in? %>
+      <%= render "shared/quick_notifications", notifications: Notification.for_user(current_user).recent_first.limit(5).includes(:actor, :notifiable) %>
+    <% end %>
   </body>
 </html>

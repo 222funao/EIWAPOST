@@ -56,5 +56,18 @@ class Notification < ApplicationRecord
       partial: "shared/notifications_panel_content",
       locals: { notifications: notifications }
     )
+
+    quick_notifications = Notification
+      .for_user(recipient)
+      .recent_first
+      .limit(5)
+      .includes(:actor, :notifiable)
+
+    broadcast_update_to(
+      *Notification.stream_for(recipient),
+      target: "quick_notifications_list",
+      partial: "shared/quick_notifications_list",
+      locals: { notifications: quick_notifications }
+    )
   end
 end

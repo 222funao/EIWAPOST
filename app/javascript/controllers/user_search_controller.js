@@ -89,7 +89,7 @@ export default class extends Controller {
   renderEmpty() {
     this.resultsTarget.innerHTML = `
       <div class="py-10 text-center text-sm text-zinc-500">
-        No hay búsquedas recientes.
+        Escribe algo para buscar usuarios.
       </div>
     `
   }

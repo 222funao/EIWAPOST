@@ -1,4 +1,4 @@
-<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+<div data-controller="profile-follows" class="min-h-screen w-full bg-zinc-950 text-zinc-100">
   <div class="w-full px-0">
     <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_1fr]">
 
@@ -73,14 +73,23 @@
               </div>
 
               <!-- Stats -->
-            <div class="mt-4 flex gap-6 text-sm">
-  <div>
-    <span class="font-semibold"><%= @posts.size %></span> publicaciones
-  </div>
+              <div class="mt-4 flex gap-6 text-sm items-center">
+                <button type="button"
+                        class="cursor-default rounded-lg px-2 py-1">
+                  <span class="font-semibold"><%= @posts.size %></span> publicaciones
+                </button>
 
-  <%= render "profiles/followers_count", user: @user %>
-  <%= render "profiles/following_count", user: @user %>
-</div>
+                <button type="button"
+                        data-action="click->profile-follows#openFollowers"
+                        class="cursor-pointer rounded-lg px-2 py-1 hover:bg-white/5 hover:text-white">
+                  <%= render "profiles/followers_count", user: @user %>
+                </button>
+                <button type="button"
+                        data-action="click->profile-follows#openFollowing"
+                        class="cursor-pointer rounded-lg px-2 py-1 hover:bg-white/5 hover:text-white">
+                  <%= render "profiles/following_count", user: @user %>
+                </button>
+              </div>
 
 
               <!-- Bio -->
@@ -177,6 +186,62 @@
       </main>
     </div>
     <%= render "shared/user_search_modal" %>
+
+    <div data-profile-follows-target="followersModal" class="hidden fixed inset-0 z-[140]">
+  <div data-action="click->profile-follows#closeFollowers" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+  <div class="relative z-10 mx-auto mt-24 w-full max-w-md px-4">
+    <div data-modal-card class="rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
+      <div class="mb-4 flex items-center justify-between">
+        <div class="text-base font-semibold text-white">Seguidores</div>
+        <button type="button"
+                data-action="click->profile-follows#closeFollowers"
+                class="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300 hover:bg-white/10">
+          Cerrar
+        </button>
+      </div>
+      <div class="max-h-[60vh] overflow-y-auto pr-1">
+        <% @user.followers.each do |follower| %>
+          <%= link_to public_profile_path(follower), class: "flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/5" do %>
+            <% if follower.avatar.attached? %>
+              <%= image_tag follower.avatar, class: "h-9 w-9 rounded-full object-cover ring-1 ring-white/10" %>
+            <% else %>
+              <%= image_tag "avatars/default.png", class: "h-9 w-9 rounded-full object-cover ring-1 ring-white/10" %>
+            <% end %>
+            <span class="text-sm text-zinc-100 hover:underline"><%= follower.username %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div data-profile-follows-target="followingModal" class="hidden fixed inset-0 z-[140]">
+  <div data-action="click->profile-follows#closeFollowing" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+  <div class="relative z-10 mx-auto mt-24 w-full max-w-md px-4">
+    <div data-modal-card class="rounded-3xl border border-white/10 bg-zinc-950/95 p-5 shadow-2xl">
+      <div class="mb-4 flex items-center justify-between">
+        <div class="text-base font-semibold text-white">Seguidos</div>
+        <button type="button"
+                data-action="click->profile-follows#closeFollowing"
+                class="rounded-full bg-white/5 px-3 py-1 text-xs text-zinc-300 hover:bg-white/10">
+          Cerrar
+        </button>
+      </div>
+      <div class="max-h-[60vh] overflow-y-auto pr-1">
+        <% @user.following.each do |followed| %>
+          <%= link_to public_profile_path(followed), class: "flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/5" do %>
+            <% if followed.avatar.attached? %>
+              <%= image_tag followed.avatar, class: "h-9 w-9 rounded-full object-cover ring-1 ring-white/10" %>
+            <% else %>
+              <%= image_tag "avatars/default.png", class: "h-9 w-9 rounded-full object-cover ring-1 ring-white/10" %>
+            <% end %>
+            <span class="text-sm text-zinc-100 hover:underline"><%= followed.username %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
   </div>
 </div>
 

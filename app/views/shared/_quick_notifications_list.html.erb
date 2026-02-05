@@ -1,0 +1,21 @@
+<% notifications.each do |notification| %>
+  <div data-notification-id="<%= notification.id %>" class="flex items-center justify-between gap-2 rounded-xl bg-white/5 px-2 py-2">
+    <div class="min-w-0 text-xs text-zinc-200">
+      <div class="truncate">
+        <% if notification.group_count.to_i > 1 && %w[like comment story_like].include?(notification.action) %>
+          <span><%= notification_message(notification) %></span>
+        <% else %>
+          <%= notification_actor_link(notification) %>
+          <span> <%= notification_message(notification) %></span>
+        <% end %>
+      </div>
+      <div class="text-[10px] text-zinc-500">
+        hace <%= time_ago_in_words(notification.updated_at || notification.created_at, locale: :es) %>
+      </div>
+    </div>
+    <% preview = notification_post_preview(notification) %>
+    <% if preview %>
+      <%= preview %>
+    <% end %>
+  </div>
+<% end %>

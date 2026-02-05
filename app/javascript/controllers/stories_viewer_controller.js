@@ -20,7 +20,8 @@ export default class extends Controller {
     "likeButton",
     "likeIcon",
     "likeIconFilled",
-    "replyStoryId"
+    "replyStoryId",
+    "replyBar"
   ]
   static values = {
     stories: Array,
@@ -123,6 +124,7 @@ export default class extends Controller {
     const story = group.stories[storyIndex]
     this._currentStoryId = story.id
     this._renderHeader(group.user, story)
+    this._setReplyLikeVisibility(group.user)
     this._renderDescription(story)
     this._renderReply(group.user)
     this._renderLike(story)
@@ -189,6 +191,18 @@ export default class extends Controller {
     }
     if (this.hasReplyStoryIdTarget) {
       this.replyStoryIdTarget.value = this._currentStoryId || ""
+    }
+  }
+
+  _setReplyLikeVisibility(user) {
+    const isOwnStory = this.currentUserIdValue && user?.id === this.currentUserIdValue
+    if (this.hasReplyBarTarget) {
+      this.replyBarTarget.classList.toggle("hidden", isOwnStory)
+    } else if (this.hasReplyFormTarget) {
+      this.replyFormTarget.classList.toggle("hidden", isOwnStory)
+    }
+    if (this.hasLikeButtonTarget) {
+      this.likeButtonTarget.classList.toggle("hidden", isOwnStory)
     }
   }
 

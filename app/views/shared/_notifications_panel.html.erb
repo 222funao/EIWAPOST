@@ -3,7 +3,7 @@
        class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
   <div class="absolute left-0 top-0 h-full w-[440px] max-w-[92vw]
-              border-r border-white/10 bg-zinc-950/95 shadow-2xl">
+              border-r border-white/10 bg-zinc-950/95 shadow-2xl flex flex-col">
     <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
       <div class="text-lg font-semibold text-white">Notificaciones</div>
       <button type="button"
@@ -13,7 +13,7 @@
       </button>
     </div>
 
-    <div id="notifications_panel_content" class="h-full overflow-y-auto px-4 pb-6 pt-4">
+    <div id="notifications_panel_content" class="notifications-scroll flex-1 min-h-0 overflow-y-auto px-4 pb-6 pt-4">
       <%= render partial: "shared/notifications_panel_content", locals: { notifications: local_assigns.fetch(:notifications, @notifications) } %>
     </div>
   </div>
