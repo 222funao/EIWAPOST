@@ -3,7 +3,9 @@
 <% end %>
 
 <%= turbo_stream.replace "message_form" do %>
-  <%= render "messages/form", active_user: @active_user, message: Message.new %>
+  <%= render "messages/form",
+    form_url: user_messages_path(@active_user, format: :turbo_stream),
+    message: Message.new %>
 <% end %>
 
 <%= turbo_stream.replace "conversation_read_status_#{@conversation.id}" do %>

@@ -1,5 +1,5 @@
 <%= form_with model: message,
-  url: user_messages_path(active_user, format: :turbo_stream),
+  url: form_url,
   method: :post,
   data: { controller: "message-form", action: "turbo:submit-end->message-form#reset", turbo: true, turbo_stream: true },
   html: { multipart: true, class: "flex items-center gap-3" } do |f| %>

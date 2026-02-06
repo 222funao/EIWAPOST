@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_05_093000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_06_123000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -72,6 +72,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_093000) do
     t.index ["follower_id"], name: "index_follows_on_follower_id"
   end
 
+  create_table "group_memberships", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "group_id", null: false
+    t.datetime "last_read_at"
+    t.integer "role", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["group_id", "user_id"], name: "index_group_memberships_on_group_id_and_user_id", unique: true
+    t.index ["group_id"], name: "index_group_memberships_on_group_id"
+    t.index ["user_id"], name: "index_group_memberships_on_user_id"
+  end
+
+  create_table "groups", force: :cascade do |t|
+    t.boolean "allow_member_edit", default: false, null: false
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_groups_on_created_by_id"
+  end
+
   create_table "likes", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "post_id", null: false
@@ -83,13 +104,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_093000) do
 
   create_table "messages", force: :cascade do |t|
     t.text "body"
-    t.bigint "conversation_id", null: false
+    t.bigint "conversation_id"
     t.datetime "created_at", null: false
+    t.bigint "group_id"
     t.datetime "read_at"
     t.bigint "sender_id", null: false
     t.bigint "story_id"
     t.datetime "updated_at", null: false
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["group_id"], name: "index_messages_on_group_id"
     t.index ["read_at"], name: "index_messages_on_read_at"
     t.index ["sender_id"], name: "index_messages_on_sender_id"
     t.index ["story_id"], name: "index_messages_on_story_id"
@@ -309,9 +332,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_093000) do
   add_foreign_key "conversations", "users", column: "user_b_id"
   add_foreign_key "follows", "users", column: "followed_id"
   add_foreign_key "follows", "users", column: "follower_id"
+  add_foreign_key "group_memberships", "groups"
+  add_foreign_key "group_memberships", "users"
+  add_foreign_key "groups", "users", column: "created_by_id"
   add_foreign_key "likes", "posts"
   add_foreign_key "likes", "users"
   add_foreign_key "messages", "conversations"
+  add_foreign_key "messages", "groups"
   add_foreign_key "messages", "stories"
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "notifications", "users", column: "actor_id"

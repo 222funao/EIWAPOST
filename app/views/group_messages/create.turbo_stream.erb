@@ -1,0 +1,9 @@
+<%= turbo_stream.append "messages_list" do %>
+  <%= render "messages/message", message: @message, current_user: current_user %>
+<% end %>
+
+<%= turbo_stream.replace "message_form" do %>
+  <%= render "messages/form",
+    form_url: group_messages_path(@group, format: :turbo_stream),
+    message: Message.new %>
+<% end %>

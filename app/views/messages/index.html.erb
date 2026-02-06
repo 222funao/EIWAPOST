@@ -1,4 +1,4 @@
-<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+<div class="min-h-screen w-full bg-zinc-950 text-zinc-100" data-controller="group-wizard group-edit">
   <div class="w-full px-0">
     <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_380px_1fr]">
       <%= render "shared/sidebar" %>
@@ -8,9 +8,13 @@
         <div class="px-6 py-6">
           <div class="flex items-center justify-between">
             <div class="text-lg font-semibold">Mensajes</div>
-            <div class="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-zinc-300">
-              Solo amigos
-            </div>
+            <button
+              type="button"
+              data-action="group-wizard#open"
+              class="grid h-7 w-7 place-items-center rounded-full border border-white/10 bg-white/5 text-sm text-zinc-200 transition hover:bg-white/10"
+              aria-label="Crear grupo">
+              +
+            </button>
           </div>
 
           <div class="mt-4">
@@ -24,6 +28,56 @@
         </div>
 
         <div class="px-3 pb-6">
+          <% if @groups.any? %>
+            <div class="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Grupos</div>
+            <div class="space-y-1">
+              <% @groups.each do |group| %>
+                <% is_group_active = @active_group&.id == group.id %>
+                <% summary = @group_summaries[group.id] %>
+                <% last_message = summary && summary[:last_message] %>
+                <% unread_count = summary && summary[:unread_count].to_i %>
+                <%= link_to messages_path(group_id: group.id),
+                  class: "flex items-center justify-between gap-4 rounded-2xl px-4 py-2
+                          #{is_group_active ? "bg-white/10" : "hover:bg-white/5"}" do %>
+                  <div class="flex items-center gap-4 min-w-0">
+                    <div class="h-12 w-12 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+                      <% if group.avatar.attached? %>
+                        <%= image_tag group.avatar, class: "h-full w-full object-cover" %>
+                      <% else %>
+                        <%= image_tag "avatars/default.png", class: "h-full w-full object-cover opacity-90" %>
+                      <% end %>
+                    </div>
+                    <div class="min-w-0">
+                      <div class="text-base font-semibold text-zinc-100 truncate"><%= group.name %></div>
+                      <div class="text-sm text-zinc-500 truncate">
+                        <% if unread_count > 0 %>
+                          <span class="font-semibold text-zinc-100">
+                            <%= unread_count == 1 ? "1 mensaje nuevo" : "#{unread_count} mensajes nuevos" %>
+                          </span>
+                        <% elsif last_message.present? %>
+                          <% sender_label = last_message.sender_id == current_user.id ? "Tu" : last_message.sender.username %>
+                          <% if last_message.body.present? %>
+                            <%= sender_label %>: <%= truncate(last_message.body, length: 42) %>
+                          <% elsif last_message.media.attached? %>
+                            <%= sender_label %>: Archivo adjunto
+                          <% else %>
+                            <%= sender_label %>: Mensaje
+                          <% end %>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="text-xs text-zinc-500">></span>
+                <% end %>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="py-6 text-center text-sm text-zinc-600">
+              Aun no tienes grupos.
+            </div>
+          <% end %>
+
+          <div class="mt-6 px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">Amigos</div>
           <% if @friends.any? %>
             <div class="space-y-1">
               <% @friends.each do |friend| %>
@@ -71,7 +125,7 @@
                       </div>
                     </div>
                   </div>
-                  <span class="text-xs text-zinc-500">›</span>
+                  <span class="text-xs text-zinc-500">></span>
                 <% end %>
               <% end %>
             </div>
@@ -85,7 +139,84 @@
 
       <!-- Panel de conversacion -->
       <main class="relative h-screen overflow-hidden">
-        <% if @active_user %>
+        <% if @active_group %>
+          <%= turbo_stream_from @active_group.stream_for(current_user) %>
+          <div class="flex h-full flex-col" data-controller="message-media">
+            <header class="flex items-center justify-between border-b border-white/10 px-6 py-4">
+              <button
+                type="button"
+                data-action="group-edit#open"
+                class="flex items-center gap-3 text-left hover:opacity-90">
+                <div class="h-10 w-10 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+                  <% if @active_group.avatar.attached? %>
+                    <%= image_tag @active_group.avatar, class: "h-full w-full object-cover" %>
+                  <% else %>
+                    <%= image_tag "avatars/default.png", class: "h-full w-full object-cover opacity-90" %>
+                  <% end %>
+                </div>
+                <div>
+                  <div class="text-base font-semibold text-zinc-100"><%= @active_group.name %></div>
+                  <div class="text-xs text-zinc-500"><%= pluralize(@active_group.members.count, "miembro") %></div>
+                </div>
+              </button>
+              <div class="text-xs text-zinc-400">Grupo</div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto px-6 py-6 messages-scroll">
+              <div id="messages_list" data-controller="message-scroll" class="space-y-2">
+                <% @messages.each do |message| %>
+                  <% if @first_unread_id && message.id == @first_unread_id %>
+                    <div class="my-3 flex items-center gap-3">
+                      <div class="h-px flex-1 bg-white/10"></div>
+                      <div class="rounded-full bg-white/10 px-3 py-1 text-xs text-zinc-200">
+                        <%= @unread_count == 1 ? "1 mensaje nuevo" : "#{@unread_count} mensajes nuevos" %>
+                      </div>
+                      <div class="h-px flex-1 bg-white/10"></div>
+                    </div>
+                  <% end %>
+                  <%= render "messages/message", message: message, current_user: current_user %>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="border-t border-white/10 px-6 py-4">
+              <div id="message_form">
+                <%= render "messages/form",
+                  form_url: group_messages_path(@active_group, format: :turbo_stream),
+                  message: Message.new %>
+              </div>
+            </div>
+
+            <div
+              data-message-media-target="modal"
+              data-action="click->message-media#closeOnBackdrop keydown.esc->message-media#close"
+              tabindex="-1"
+              class="hidden fixed inset-0 z-[140] bg-zinc-950/85 backdrop-blur-sm p-4 sm:p-8">
+              <button
+                type="button"
+                class="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-black/45 text-xl text-white ring-1 ring-white/25 transition hover:bg-black/65"
+                data-action="click->message-media#close"
+                aria-label="Cerrar vista previa">
+                X
+              </button>
+
+              <div class="grid h-full place-items-center" data-action="click->message-media#ignore">
+                <div class="inline-block max-w-[92vw] rounded-3xl bg-gradient-to-br from-zinc-900/95 via-zinc-950/95 to-sky-950/65 p-3 shadow-[0_30px_110px_rgba(2,132,199,0.23)] ring-1 ring-white/15 sm:p-4">
+                  <%= image_tag "",
+                    data: { message_media_target: "image" },
+                    class: "hidden h-[84vh] w-auto max-w-[92vw] rounded-2xl object-contain" %>
+
+                  <%= video_tag "",
+                    data: { message_media_target: "video" },
+                    class: "hidden h-[84vh] w-auto max-w-[92vw] rounded-2xl ring-1 ring-white/15",
+                    controls: true,
+                    playsinline: true,
+                    preload: "metadata" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% elsif @active_user %>
           <%= turbo_stream_from @conversation.stream_for(current_user) %>
           <div class="flex h-full flex-col" data-controller="message-media">
             <header class="flex items-center justify-between border-b border-white/10 px-6 py-4">
@@ -126,7 +257,9 @@
 
             <div class="border-t border-white/10 px-6 py-4">
               <div id="message_form">
-                <%= render "messages/form", active_user: @active_user, message: Message.new %>
+                <%= render "messages/form",
+                  form_url: user_messages_path(@active_user, format: :turbo_stream),
+                  message: Message.new %>
               </div>
             </div>
 
@@ -140,7 +273,7 @@
                 class="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-black/45 text-xl text-white ring-1 ring-white/25 transition hover:bg-black/65"
                 data-action="click->message-media#close"
                 aria-label="Cerrar vista previa">
-                ✕
+                X
               </button>
 
               <div class="grid h-full place-items-center" data-action="click->message-media#ignore">
@@ -163,19 +296,27 @@
           <div class="grid h-full place-items-center px-6">
             <div class="text-center">
               <div class="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full border border-white/15 bg-white/5 text-2xl">
-                ✉
+                @
               </div>
               <div class="text-lg font-semibold">Tus mensajes</div>
               <div class="mt-1 text-sm text-zinc-500">
-                Envia mensajes y fotos privadas a un amigo.
+                Envia mensajes y fotos privadas a amigos o grupos.
               </div>
-              <div class="mt-4 text-xs text-zinc-600">Selecciona un amigo en la izquierda.</div>
+              <div class="mt-4 text-xs text-zinc-600">Selecciona un amigo o un grupo en la izquierda.</div>
             </div>
           </div>
         <% end %>
       </main>
     </div>
 
+    <%= render "groups/create_modal", friends: @friends %>
+    <% if @active_group %>
+      <%= render "groups/edit_modal",
+        group: @active_group,
+        group_memberships: @group_memberships,
+        available_friends: @available_friends,
+        can_manage_group: @can_manage_group %>
+    <% end %>
     <%= render "shared/user_search_modal" %>
   </div>
 </div>

@@ -19,6 +19,10 @@ Rails.application.routes.draw do
   # ✅ mensajes (solo entre amigos)
   get  "/messages", to: "messages#index", as: :messages
   post "/messages/:user_id", to: "messages#create", as: :user_messages
+  resources :groups, only: [:create, :update] do
+    resources :group_memberships, only: [:create, :update, :destroy]
+    resources :messages, only: [:create], controller: "group_messages"
+  end
 
   resources :posts, only: [:new, :create, :show] do
     resources :comments, only: [:create, :destroy]
