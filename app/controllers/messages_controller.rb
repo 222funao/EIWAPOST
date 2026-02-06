@@ -29,6 +29,7 @@ class MessagesController < ApplicationController
           locals: { conversation: @conversation, current_user: @active_user }
         )
       end
+      broadcast_message_indicator(current_user)
     else
       @conversation = nil
       @messages = []
@@ -150,6 +151,16 @@ class MessagesController < ApplicationController
     @unread_count = unread_scope.count
     @first_unread_id = unread_scope.order(:created_at).limit(1).pluck(:id).first
     membership&.update!(last_read_at: Time.current)
+    broadcast_message_indicator(current_user)
+  end
+
+  def broadcast_message_indicator(user)
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "message_indicator_#{user.id}",
+      target: "messages_indicator",
+      partial: "shared/messages_indicator",
+      locals: { has_unread_messages: user.has_unread_messages? }
+    )
   end
 
   def notify_story_reply(message)

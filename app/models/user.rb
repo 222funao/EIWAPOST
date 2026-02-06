@@ -57,6 +57,25 @@ class User < ApplicationRecord
     User.where(id: friend_ids)
   end
 
+  def has_unread_messages?
+    private_unread =
+      Message
+        .where(read_at: nil)
+        .where.not(sender_id: id)
+        .where(conversation_id: Conversation.where("user_a_id = ? OR user_b_id = ?", id, id))
+        .exists?
+
+    group_unread =
+      Message
+        .joins("INNER JOIN group_memberships ON group_memberships.group_id = messages.group_id")
+        .where("group_memberships.user_id = ?", id)
+        .where.not(sender_id: id)
+        .where("group_memberships.last_read_at IS NULL OR messages.created_at > group_memberships.last_read_at")
+        .exists?
+
+    private_unread || group_unread
+  end
+
   private
 
   def set_default_avatar

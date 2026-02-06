@@ -1,5 +1,9 @@
 <!-- Sidebar izquierda (colapsado -> expandible al hover) -->
-<aside class="group sticky top-0 z-50 hidden h-screen lg:block">
+<aside class="group sticky top-0 z-50 hidden h-screen lg:block" data-controller="message-indicator">
+  <% if user_signed_in? && !messages_page? %>
+    <%= turbo_stream_from "message_indicator_#{current_user.id}" %>
+  <% end %>
+
 
   <!-- contenedor con ancho animado -->
   <div class="relative flex h-full w-[96px] flex-col transition-[width,transform] duration-200 ease-out group-hover:w-[220px] group-hover:translate-x-0">
@@ -62,9 +66,16 @@
 
       <% end %>
 
-      <%= link_to messages_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3" do %>
+      <%= link_to messages_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3", data: { action: "click->message-indicator#clear" } do %>
 
-        <span class="text-xl">✉️</span>
+        <span class="relative text-xl">
+          ✉️
+          <% unless messages_page? %>
+            <span id="messages_indicator">
+              <%= render "shared/messages_indicator", has_unread_messages: @has_unread_messages %>
+            </span>
+          <% end %>
+        </span>
         <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
              opacity-0 -translate-x-2
              transition duration-200 ease-out
@@ -124,4 +135,6 @@
     </div>
   </div>
 </aside>
+
+
 

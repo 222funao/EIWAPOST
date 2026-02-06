@@ -28,6 +28,7 @@ class Message < ApplicationRecord
           partial: "messages/message",
           locals: { message: self, current_user: member }
         )
+        broadcast_message_indicator(member)
       end
     else
       recipient = conversation.other_for(sender)
@@ -37,6 +38,7 @@ class Message < ApplicationRecord
         partial: "messages/message",
         locals: { message: self, current_user: recipient }
       )
+      broadcast_message_indicator(recipient)
     end
   end
 
@@ -44,5 +46,14 @@ class Message < ApplicationRecord
     return if conversation_id.present? ^ group_id.present?
 
     errors.add(:base, "Debe tener una conversacion o un grupo")
+  end
+
+  def broadcast_message_indicator(user)
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "message_indicator_#{user.id}",
+      target: "messages_indicator",
+      partial: "shared/messages_indicator",
+      locals: { has_unread_messages: user.has_unread_messages? }
+    )
   end
 end
