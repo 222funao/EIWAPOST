@@ -19,7 +19,8 @@ class PersonalizationsController < ApplicationController
       :feed_posts_scope,
       :feed_include_own_posts,
       :feed_stories_scope,
-      :feed_theme
+      :feed_theme,
+      :feed_icon_style
     )
   end
 end

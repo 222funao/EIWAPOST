@@ -312,6 +312,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_06_140000) do
     t.datetime "created_at", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
+    t.string "feed_icon_style", default: "outline", null: false
     t.boolean "feed_include_own_posts", default: true, null: false
     t.string "feed_posts_scope", default: "all", null: false
     t.boolean "feed_show_own_posts", default: true, null: false

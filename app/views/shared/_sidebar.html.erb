@@ -3,10 +3,11 @@
   <% if user_signed_in? && !messages_page? %>
     <%= turbo_stream_from "message_indicator_#{current_user.id}" %>
   <% end %>
+  <% icon_style = current_user&.feed_icon_style.presence || "outline" %>
 
 
   <!-- contenedor con ancho animado -->
-  <div class="relative flex h-full w-[96px] flex-col transition-[width,transform] duration-200 ease-out group-hover:w-[220px] group-hover:translate-x-0">
+  <div class="relative flex h-full w-[80px] flex-col transition-[width,transform] duration-200 ease-out group-hover:w-[220px] group-hover:translate-x-0">
     <!-- Fondo sidebar -->
     <div class="pointer-events-none absolute inset-y-0 left-0 -right-1 sidebar-bg transition-all duration-200 ease-out group-hover:translate-x-0"></div>
 
@@ -16,7 +17,7 @@
       <div class="flex items-center justify-center group-hover:justify-start gap-3">
         <%= image_tag "logo/eiwa.png",
   class: "h-9 w-9 rounded-full object-cover" %>
-        <div class="pointer-events-none absolute left-[60px] whitespace-nowrap text-xl
+        <div class="pointer-events-none absolute left-[56px] ml-px whitespace-nowrap text-xl
              opacity-0 -translate-x-2
              transition duration-200 ease-out
              group-hover:opacity-100 group-hover:translate-x-0 font-bold">
@@ -28,9 +29,12 @@
     <!-- Nav -->
     <nav class="relative mt-2 flex flex-1 flex-col gap-1 px-2 text-sm">
       <%= link_to root_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
-
-        <span class="text-xl">🏠</span>
-      <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+        <% if icon_style == "emoji" %>
+          <span class="text-xl">🏠</span>
+        <% else %>
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5 12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5H15a1.5 1.5 0 0 1-1.5-1.5V15h-3v4.5A1.5 1.5 0 0 1 9 21H4.5A1.5 1.5 0 0 1 3 19.5v-9Z"/></svg>
+        <% end %>
+      <span class="pointer-events-none absolute left-[54px] whitespace-nowrap text-lg text-zinc-200
              opacity-0 -translate-x-2
              transition duration-200 ease-out
              group-hover:opacity-100 group-hover:translate-x-0">
@@ -43,8 +47,12 @@
 <button type="button"
   data-action="click->user-search#open"
   class="flex w-full items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3">
-  <span class="text-xl">🔍</span>
-  <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+  <% if icon_style == "emoji" %>
+    <span class="text-xl">🔍</span>
+  <% else %>
+    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg>
+  <% end %>
+  <span class="pointer-events-none absolute left-[54px] whitespace-nowrap text-lg text-zinc-200
                opacity-0 -translate-x-2 transition duration-200 ease-out
                group-hover:opacity-100 group-hover:translate-x-0">
     Buscar
@@ -55,9 +63,12 @@
       
 
       <%= link_to "#", class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
-
-        <span class="text-xl  ">🎮</span>
-        <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+        <% if icon_style == "emoji" %>
+          <span class="text-xl">🎮</span>
+        <% else %>
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 10.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm6 2.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-7 1.5 2 2m0 0 2-2m-2 2v3m5-2h2a2 2 0 0 0 2-2v-1a3 3 0 0 0-3-3h-1.5M8.5 13H7a3 3 0 0 0-3 3v1a2 2 0 0 0 2 2h2"/></svg>
+        <% end %>
+        <span class="pointer-events-none absolute left-[54px] whitespace-nowrap text-lg text-zinc-200
              opacity-0 -translate-x-2
              transition duration-200 ease-out
              group-hover:opacity-100 group-hover:translate-x-0">
@@ -68,15 +79,19 @@
 
       <%= link_to messages_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3", data: { action: "click->message-indicator#clear" } do %>
 
-        <span class="relative text-xl">
-          ✉️
+        <span class="<%= icon_style == 'emoji' ? 'relative text-xl' : 'relative' %>">
+          <% if icon_style == "emoji" %>
+            ✉️
+          <% else %>
+            <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6.75A1.75 1.75 0 0 1 4.75 5h14.5A1.75 1.75 0 0 1 21 6.75v10.5A1.75 1.75 0 0 1 19.25 19H4.75A1.75 1.75 0 0 1 3 17.25V6.75Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m4 7 8 6 8-6"/></svg>
+          <% end %>
           <% unless messages_page? %>
             <span id="messages_indicator">
               <%= render "shared/messages_indicator", has_unread_messages: @has_unread_messages %>
             </span>
           <% end %>
         </span>
-        <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+        <span class="pointer-events-none absolute left-[54px] whitespace-nowrap text-lg text-zinc-200
              opacity-0 -translate-x-2
              transition duration-200 ease-out
              group-hover:opacity-100 group-hover:translate-x-0">
@@ -85,11 +100,15 @@
 
       <% end %>
 
-      <button type="button"
+<button type="button"
   data-action="click->notifications-panel#open"
   class="flex w-full items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3">
-  <span class="text-xl">❤️</span>
-  <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+  <% if icon_style == "emoji" %>
+    <span class="text-xl">❤️</span>
+  <% else %>
+    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20.25s-7.5-4.35-9-8.7C1.8 8.25 3.9 5.25 7.2 5.25c1.8 0 3.15.9 3.9 2.1.75-1.2 2.1-2.1 3.9-2.1 3.3 0 5.4 3 4.2 6.3-1.5 4.35-9 8.7-9 8.7Z"/></svg>
+  <% end %>
+  <span class="pointer-events-none absolute left-[54px] whitespace-nowrap text-lg text-zinc-200
        opacity-0 -translate-x-2
        transition duration-200 ease-out
        group-hover:opacity-100 group-hover:translate-x-0">
@@ -98,9 +117,12 @@
 </button>
 
       <%= link_to new_post_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
-
-        <span class="text-xl">➕</span>
-        <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+        <% if icon_style == "emoji" %>
+          <span class="text-xl">➕</span>
+        <% else %>
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/></svg>
+        <% end %>
+        <span class="pointer-events-none absolute left-[54px] whitespace-nowrap text-lg text-zinc-200
              opacity-0 -translate-x-2
              transition duration-200 ease-out
              group-hover:opacity-100 group-hover:translate-x-0">
@@ -110,9 +132,12 @@
       <% end %>
 
       <%= link_to personalizacion_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
-
-        <span class="text-xl">⚙️</span>
-        <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+        <% if icon_style == "emoji" %>
+          <span class="text-xl">⚙️</span>
+        <% else %>
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75A2.25 2.25 0 1 0 12 14.25 2.25 2.25 0 0 0 12 9.75Zm7.5 2.25c0 .33-.02.66-.06.98l2.06 1.6-2 3.46-2.46-1a7.5 7.5 0 0 1-1.7.98l-.37 2.64h-4l-.37-2.64a7.5 7.5 0 0 1-1.7-.98l-2.46 1-2-3.46 2.06-1.6A7.73 7.73 0 0 1 4.5 12c0-.33.02-.66.06-.98L2.5 9.42l2-3.46 2.46 1c.52-.39 1.1-.72 1.7-.98L9.03 3.3h4l.37 2.64c.6.26 1.18.59 1.7.98l2.46-1 2 3.46-2.06 1.6c.04.32.06.65.06.98Z"/></svg>
+        <% end %>
+        <span class="pointer-events-none absolute left-[54px] whitespace-nowrap text-lg text-zinc-200
              opacity-0 -translate-x-2
              transition duration-200 ease-out
              group-hover:opacity-100 group-hover:translate-x-0">
@@ -121,9 +146,12 @@
 
       <% end %>
       <%= link_to profile_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
-
-        <span class="text-xl">👤</span>
-        <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+        <% if icon_style == "emoji" %>
+          <span class="text-xl">👤</span>
+        <% else %>
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6.75a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 19.5a7.5 7.5 0 0 1 15 0"/></svg>
+        <% end %>
+        <span class="pointer-events-none absolute left-[54px] whitespace-nowrap text-lg text-zinc-200
              opacity-0 -translate-x-2
              transition duration-200 ease-out
              group-hover:opacity-100 group-hover:translate-x-0">
@@ -137,8 +165,12 @@
     <div class="relative p-2">
       <%= link_to destroy_user_session_path, data: { turbo_method: :delete },
         class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3"  do %>
-        <span class="text-xl">🚪</span>
-        <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+        <% if icon_style == "emoji" %>
+          <span class="text-xl">🚪</span>
+        <% else %>
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15"/><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 12h9m0 0-3-3m3 3-3 3"/></svg>
+        <% end %>
+        <span class="pointer-events-none absolute left-[54px] whitespace-nowrap text-lg text-zinc-200
              opacity-0 -translate-x-2
              transition duration-200 ease-out
              group-hover:opacity-100 group-hover:translate-x-0">Cerrar sesión</span>
@@ -146,9 +178,3 @@
     </div>
   </div>
 </aside>
-
-
-
-
-
-
