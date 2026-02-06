@@ -5,3 +5,7 @@
 <%= turbo_stream.replace "message_form" do %>
   <%= render "messages/form", active_user: @active_user, message: Message.new %>
 <% end %>
+
+<%= turbo_stream.replace "conversation_read_status_#{@conversation.id}" do %>
+  <%= render "messages/read_status", conversation: @conversation, current_user: current_user %>
+<% end %>

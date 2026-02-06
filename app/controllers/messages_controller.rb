@@ -8,14 +8,31 @@ class MessagesController < ApplicationController
     if @active_user
       @conversation = Conversation.find_or_create_between!(current_user, @active_user)
       @messages =
-      @conversation
+        @conversation
           .messages
           .includes(:sender, :story, story: { media_attachment: :blob }, media_attachments: :blob)
           .order(:created_at)
+      unread_scope = @conversation.messages.where(sender_id: @active_user.id, read_at: nil)
+      @unread_count = unread_scope.count
+      @first_unread_id = unread_scope.order(:created_at).limit(1).pluck(:id).first
+      marked_count = unread_scope.update_all(read_at: Time.current)
+
+      if marked_count.positive?
+        Turbo::StreamsChannel.broadcast_replace_to(
+          @conversation.stream_for(@active_user),
+          target: "conversation_read_status_#{@conversation.id}",
+          partial: "messages/read_status",
+          locals: { conversation: @conversation, current_user: @active_user }
+        )
+      end
     else
       @conversation = nil
       @messages = []
+      @unread_count = 0
+      @first_unread_id = nil
     end
+
+    @friend_summaries = build_friend_summaries(@friends)
   end
 
   def create
@@ -58,6 +75,25 @@ class MessagesController < ApplicationController
 
   def message_params
     params.require(:message).permit(:body, :story_id, media: [])
+  end
+
+  def build_friend_summaries(friends)
+    summaries = {}
+    friends.each do |friend|
+      conversation = Conversation.between(current_user, friend)
+      last_message = conversation&.messages&.order(created_at: :desc)&.first
+      unread_count =
+        if conversation
+          conversation.messages.where(sender_id: friend.id, read_at: nil).count
+        else
+          0
+        end
+      summaries[friend.id] = {
+        last_message: last_message,
+        unread_count: unread_count
+      }
+    end
+    summaries
   end
 
   def notify_story_reply(message)

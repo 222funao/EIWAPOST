@@ -1,0 +1,12 @@
+<% last_message = conversation.messages.order(created_at: :desc).first %>
+<% last_sent = conversation.messages.where(sender: current_user).order(created_at: :desc).first %>
+<% show_status = last_message.present? && last_message.sender_id == current_user.id && last_sent.present? %>
+<div id="conversation_read_status_<%= conversation.id %>" class="mt-2 text-xs text-zinc-500 text-right">
+  <% if show_status %>
+    <% if last_sent.read_at.present? %>
+      Visto hace <%= time_ago_in_words(last_sent.read_at, locale: :es) %>
+    <% else %>
+      Enviado hace <%= time_ago_in_words(last_sent.created_at, locale: :es) %>
+    <% end %>
+  <% end %>
+</div>

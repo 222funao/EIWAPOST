@@ -1,6 +1,6 @@
 <div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
   <div class="w-full px-0">
-    <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_360px_1fr]">
+    <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_380px_1fr]">
       <%= render "shared/sidebar" %>
 
       <!-- Lista de amigos -->
@@ -28,11 +28,14 @@
             <div class="space-y-1">
               <% @friends.each do |friend| %>
                 <% is_active = @active_user&.id == friend.id %>
+                <% summary = @friend_summaries[friend.id] %>
+                <% last_message = summary && summary[:last_message] %>
+                <% unread_count = summary && summary[:unread_count].to_i %>
                 <%= link_to messages_path(user_id: friend.id),
-                  class: "flex items-center justify-between gap-3 rounded-xl px-3 py-2
+                  class: "flex items-center justify-between gap-4 rounded-2xl px-4 py-2
                           #{is_active ? "bg-white/10" : "hover:bg-white/5"}" do %>
-                  <div class="flex items-center gap-3 min-w-0">
-                    <div class="h-10 w-10 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+                  <div class="flex items-center gap-4 min-w-0">
+                    <div class="h-12 w-12 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
                       <% if friend.avatar.attached? %>
                         <%= image_tag friend.avatar, class: "h-full w-full object-cover" %>
                       <% else %>
@@ -40,9 +43,31 @@
                       <% end %>
                     </div>
                     <div class="min-w-0">
-                      <div class="text-sm font-semibold text-zinc-100 truncate"><%= friend.username %></div>
-                      <div class="text-xs text-zinc-500 truncate">
-                        Amigos
+                      <div class="text-base font-semibold text-zinc-100 truncate"><%= friend.username %></div>
+                      <div class="text-sm text-zinc-500 truncate">
+                        <% if unread_count > 0 %>
+                          <span class="font-semibold text-zinc-100">
+                            <%= unread_count == 1 ? "1 mensaje nuevo" : "#{unread_count} mensajes nuevos" %>
+                          </span>
+                        <% elsif last_message.present? %>
+                          <% if last_message.sender_id == current_user.id %>
+                            <% if last_message.body.present? %>
+                              Tu: <%= truncate(last_message.body, length: 42) %>
+                            <% elsif last_message.media.attached? %>
+                              Tu: Archivo adjunto
+                            <% else %>
+                              Tu: Mensaje
+                            <% end %>
+                          <% else %>
+                            <% if last_message.body.present? %>
+                              <%= truncate(last_message.body, length: 42) %>
+                            <% elsif last_message.media.attached? %>
+                              Archivo adjunto
+                            <% else %>
+                              Mensaje
+                            <% end %>
+                          <% end %>
+                        <% end %>
                       </div>
                     </div>
                   </div>
@@ -74,7 +99,7 @@
                   <% end %>
                 </div>
                 <div>
-                  <div class="text-sm font-semibold text-zinc-100"><%= @active_user.username %></div>
+                  <div class="text-base font-semibold text-zinc-100"><%= @active_user.username %></div>
                   <div class="text-xs text-zinc-500">Amigos</div>
                 </div>
               <% end %>
@@ -84,9 +109,19 @@
             <div class="flex-1 overflow-y-auto px-6 py-6 messages-scroll">
               <div id="messages_list" data-controller="message-scroll" class="space-y-2">
                 <% @messages.each do |message| %>
+                  <% if @first_unread_id && message.id == @first_unread_id %>
+                    <div class="my-3 flex items-center gap-3">
+                      <div class="h-px flex-1 bg-white/10"></div>
+                      <div class="rounded-full bg-white/10 px-3 py-1 text-xs text-zinc-200">
+                        <%= @unread_count == 1 ? "1 mensaje nuevo" : "#{@unread_count} mensajes nuevos" %>
+                      </div>
+                      <div class="h-px flex-1 bg-white/10"></div>
+                    </div>
+                  <% end %>
                   <%= render "messages/message", message: message, current_user: current_user %>
                 <% end %>
               </div>
+              <%= render "messages/read_status", conversation: @conversation, current_user: current_user %>
             </div>
 
             <div class="border-t border-white/10 px-6 py-4">

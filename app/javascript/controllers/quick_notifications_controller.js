@@ -10,6 +10,7 @@ export default class extends Controller {
     this._offset = { x: 0, y: 0 }
     this._dragMoved = false
     this._dragStart = { x: 0, y: 0 }
+    this._loadPosition()
     this._observer = new MutationObserver(() => this._handleListChange())
     if (this.hasListTarget) {
       this._observer.observe(this.listTarget, { childList: true, subtree: false })
@@ -56,6 +57,7 @@ export default class extends Controller {
     this.element.style.top = `${Math.max(8, y)}px`
     this.element.style.right = "auto"
     this.element.style.bottom = "auto"
+    this._updatePanelPlacement()
   }
 
   endDrag(event) {
@@ -63,8 +65,31 @@ export default class extends Controller {
     this._dragging = false
     this.element.classList.remove("select-none")
     this.element.releasePointerCapture(event.pointerId)
+    this._savePosition()
     if (!this._dragMoved) {
       this.toggle()
+    }
+  }
+
+  _savePosition() {
+    const rect = this.element.getBoundingClientRect()
+    const payload = { x: rect.left, y: rect.top }
+    window.localStorage.setItem("quick_notifications_pos", JSON.stringify(payload))
+  }
+
+  _loadPosition() {
+    const raw = window.localStorage.getItem("quick_notifications_pos")
+    if (!raw) return
+    try {
+      const parsed = JSON.parse(raw)
+      if (typeof parsed.x !== "number" || typeof parsed.y !== "number") return
+      this.element.style.left = `${Math.max(8, parsed.x)}px`
+      this.element.style.top = `${Math.max(8, parsed.y)}px`
+      this.element.style.right = "auto"
+      this.element.style.bottom = "auto"
+      this._updatePanelPlacement()
+    } catch (e) {
+      return
     }
   }
 
@@ -89,7 +114,8 @@ export default class extends Controller {
 
   _openPanel() {
     this._open = true
-    this.panelTarget.classList.remove("opacity-0", "translate-y-2", "pointer-events-none")
+    this._updatePanelPlacement()
+    this.panelTarget.classList.remove("opacity-0", "translate-y-2", "-translate-y-2", "pointer-events-none")
     this.panelTarget.classList.add("opacity-100", "translate-y-0", "pointer-events-auto")
     if (this.hasPingTarget) {
       this.pingTarget.classList.add("opacity-0")
@@ -99,8 +125,31 @@ export default class extends Controller {
 
   _closePanel() {
     this._open = false
-    this.panelTarget.classList.add("opacity-0", "translate-y-2", "pointer-events-none")
+    this._updatePanelPlacement()
+    this.panelTarget.classList.add("opacity-0", "pointer-events-none")
     this.panelTarget.classList.remove("opacity-100", "translate-y-0", "pointer-events-auto")
+  }
+
+  _updatePanelPlacement() {
+    if (!this.hasPanelTarget) return
+    const rect = this.element.getBoundingClientRect()
+    const midpoint = rect.top + rect.height / 2
+    const showBelow = midpoint < window.innerHeight / 2
+    if (showBelow) {
+      this.panelTarget.classList.remove("bottom-14", "-translate-y-2")
+      this.panelTarget.classList.add("top-14")
+      if (!this._open) {
+        this.panelTarget.classList.add("translate-y-2")
+        this.panelTarget.classList.remove("-translate-y-2")
+      }
+    } else {
+      this.panelTarget.classList.remove("top-14", "translate-y-2")
+      this.panelTarget.classList.add("bottom-14")
+      if (!this._open) {
+        this.panelTarget.classList.add("-translate-y-2")
+        this.panelTarget.classList.remove("translate-y-2")
+      }
+    }
   }
 
   _trimToFive() {
