@@ -1,4 +1,4 @@
-<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+<div class="min-h-screen w-full text-zinc-100 app-bg">
   <div class="w-full pr-6 lg:pr-12 2xl:pr-6 pl-0">
     <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_1fr_340px]">
       <%= render "shared/sidebar" %>
@@ -30,14 +30,14 @@
 
               <button type="button"
                       data-action="click->stories-viewer#prev"
-                      class="absolute left-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white shadow-lg backdrop-blur transition hover:scale-105 hover:bg-black/60">
+                      class="absolute left-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white shadow-lg backdrop-blur transition hover:scale-105 hover:bg-black/45">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6" />
                 </svg>
               </button>
               <button type="button"
                       data-action="click->stories-viewer#next"
-                      class="absolute right-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white shadow-lg backdrop-blur transition hover:scale-105 hover:bg-black/60">
+                      class="absolute right-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white shadow-lg backdrop-blur transition hover:scale-105 hover:bg-black/45">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
                 </svg>
@@ -58,19 +58,19 @@
                         <div class="flex items-center gap-2">
                           <img data-stories-viewer-target="avatar" class="h-9 w-9 rounded-full object-cover" alt="" />
                           <div class="text-sm font-semibold" data-stories-viewer-target="username"></div>
-                          <div data-stories-viewer-target="time" class="rounded-full bg-black/40 px-2.5 py-1 text-sm text-white/95"></div>
+                          <div data-stories-viewer-target="time" class="rounded-full bg-black/30 px-2.5 py-1 text-sm text-white/95"></div>
                         </div>
                         <div class="flex items-center gap-2">
                           <button type="button"
                                   data-stories-viewer-target="pauseToggle"
                                   data-action="click->stories-viewer#togglePause"
-                                  class="rounded-full bg-black/40 px-2.5 py-1.5 text-sm text-white/95 hover:bg-black/60">
+                                  class="rounded-full bg-black/30 px-2.5 py-1.5 text-sm text-white/95 hover:bg-black/45">
                             ⏸
                           </button>
                           <button type="button"
                                   data-stories-viewer-target="soundToggle"
                                   data-action="click->stories-viewer#toggleSound"
-                                  class="rounded-full bg-black/40 px-2.5 py-1.5 text-sm text-white/95 hover:bg-black/60">
+                                  class="rounded-full bg-black/30 px-2.5 py-1.5 text-sm text-white/95 hover:bg-black/45">
                             🔊
                           </button>
                         </div>
@@ -86,7 +86,7 @@
                     <div class="pointer-events-none absolute inset-x-0 bottom-0 z-20">
                       <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 via-black/35 to-transparent"></div>
                       <div class="relative px-6 pb-20 pt-10 text-center">
-                        <div data-stories-viewer-target="description" class="mx-auto inline-block max-w-[280px] rounded-xl bg-black/40 px-3 py-1.5 text-sm text-white/95"></div>
+                        <div data-stories-viewer-target="description" class="mx-auto inline-block max-w-[280px] rounded-xl bg-black/30 px-3 py-1.5 text-sm text-white/95"></div>
                       </div>
                     </div>
 
@@ -95,7 +95,7 @@
                         <form data-stories-viewer-target="replyForm"
                               data-action="submit->stories-viewer#submitReply"
                               class="flex-1">
-                          <div class="flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 backdrop-blur">
+                          <div class="flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 backdrop-blur">
                             <input data-stories-viewer-target="replyInput"
                                    type="text"
                                    name="message[body]"
@@ -118,7 +118,7 @@
                         <button type="button"
                                 data-stories-viewer-target="likeButton"
                                 data-action="click->stories-viewer#toggleLike"
-                                class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white/90 hover:bg-black/60">
+                                class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white/90 hover:bg-black/45">
                           <span data-stories-viewer-target="likeIcon" class="text-base leading-none">🤍</span>
                           <span data-stories-viewer-target="likeIconFilled" class="hidden text-base leading-none">❤️</span>
                         </button>
@@ -136,6 +136,9 @@
     </div>
   </div>
 </div>
+
+
+
 
 
 

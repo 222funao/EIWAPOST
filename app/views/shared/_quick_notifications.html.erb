@@ -15,7 +15,7 @@
 
   <div data-quick-notifications-target="panel"
        class="pointer-events-none absolute bottom-14 right-0 w-80 max-w-[90vw] translate-y-2 opacity-0 transition duration-200">
-    <div class="rounded-2xl border border-white/10 bg-zinc-950/95 p-3 shadow-2xl">
+    <div class="rounded-2xl border border-white/10 bg-zinc-900/35 p-3 shadow-2xl">
       <div class="mb-2 text-xs font-semibold text-zinc-400">Notificaciones</div>
       <div id="quick_notifications_list" data-quick-notifications-target="list" class="space-y-2">
         <%= render partial: "shared/quick_notifications_list", locals: { notifications: local_assigns.fetch(:notifications, []) } %>
@@ -23,3 +23,4 @@
     </div>
   </div>
 </div>
+

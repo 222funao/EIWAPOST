@@ -33,6 +33,9 @@ Rails.application.routes.draw do
     resource :like, only: [:create, :destroy], controller: "story_likes"
   end
 
+  get  "/personalizacion", to: "personalizations#edit", as: :personalizacion
+  patch "/personalizacion", to: "personalizations#update"
+
   devise_for :users
 
   authenticated :user do

@@ -8,12 +8,12 @@
   <!-- contenedor con ancho animado -->
   <div class="relative flex h-full w-[96px] flex-col transition-[width,transform] duration-200 ease-out group-hover:w-[220px] group-hover:translate-x-0">
     <!-- Fondo sidebar -->
-    <div class="pointer-events-none absolute inset-0 -translate-x-3 bg-zinc-950/90 transition-all duration-200 ease-out group-hover:translate-x-0"></div>
+    <div class="pointer-events-none absolute inset-y-0 left-0 -right-1 sidebar-bg transition-all duration-200 ease-out group-hover:translate-x-0"></div>
 
 
     <!-- Logo -->
     <div class="relative px-4 py-6">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center justify-center group-hover:justify-start gap-3">
         <%= image_tag "logo/eiwa.png",
   class: "h-9 w-9 rounded-full object-cover" %>
         <div class="pointer-events-none absolute left-[60px] whitespace-nowrap text-xl
@@ -27,7 +27,7 @@
 
     <!-- Nav -->
     <nav class="relative mt-2 flex flex-1 flex-col gap-1 px-2 text-sm">
-      <%= link_to root_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3" do %>
+      <%= link_to root_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
 
         <span class="text-xl">🏠</span>
       <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
@@ -42,7 +42,7 @@
 
 <button type="button"
   data-action="click->user-search#open"
-  class="flex w-full items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3">
+  class="flex w-full items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3">
   <span class="text-xl">🔍</span>
   <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
                opacity-0 -translate-x-2 transition duration-200 ease-out
@@ -54,7 +54,7 @@
 
       
 
-      <%= link_to "#", class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3" do %>
+      <%= link_to "#", class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
 
         <span class="text-xl  ">🎮</span>
         <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
@@ -66,7 +66,7 @@
 
       <% end %>
 
-      <%= link_to messages_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3", data: { action: "click->message-indicator#clear" } do %>
+      <%= link_to messages_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3", data: { action: "click->message-indicator#clear" } do %>
 
         <span class="relative text-xl">
           ✉️
@@ -87,7 +87,7 @@
 
       <button type="button"
   data-action="click->notifications-panel#open"
-  class="flex w-full items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3">
+  class="flex w-full items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3">
   <span class="text-xl">❤️</span>
   <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
        opacity-0 -translate-x-2
@@ -97,7 +97,7 @@
   </span>
 </button>
 
-      <%= link_to new_post_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3" do %>
+      <%= link_to new_post_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
 
         <span class="text-xl">➕</span>
         <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
@@ -109,7 +109,18 @@
 
       <% end %>
 
-      <%= link_to profile_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3" do %>
+      <%= link_to personalizacion_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
+
+        <span class="text-xl">⚙️</span>
+        <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
+             opacity-0 -translate-x-2
+             transition duration-200 ease-out
+             group-hover:opacity-100 group-hover:translate-x-0">
+  Personalizacion
+</span>
+
+      <% end %>
+      <%= link_to profile_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
 
         <span class="text-xl">👤</span>
         <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
@@ -125,7 +136,7 @@
     <!-- Cerrar sesión -->
     <div class="relative p-2">
       <%= link_to destroy_user_session_path, data: { turbo_method: :delete },
-        class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-start group-hover:justify-start gap-0 group-hover:gap-3"  do %>
+        class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3"  do %>
         <span class="text-xl">🚪</span>
         <span class="pointer-events-none absolute left-[60px] whitespace-nowrap text-lg text-zinc-200
              opacity-0 -translate-x-2
@@ -135,6 +146,9 @@
     </div>
   </div>
 </aside>
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+<div class="min-h-screen w-full text-zinc-100 app-bg">
   <div class="w-full pr-6 lg:pr-12 2xl:pr-6 pl-0">
     <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_1fr_340px]">
       <%= render "shared/sidebar" %>
@@ -8,7 +8,7 @@
           <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
 
           <div class="relative z-10 mx-auto flex h-full max-w-[1100px] items-center justify-center px-4">
-            <div class="relative w-full max-h-[90vh] h-[90vh] overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/40 shadow-2xl lg:grid lg:grid-cols-[1.1fr_0.9fr]">
+            <div class="relative w-full max-h-[90vh] h-[90vh] overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/30 shadow-2xl lg:grid lg:grid-cols-[1.1fr_0.9fr]">
               <%= link_to root_path,
                 class: "absolute right-4 top-4 z-20 rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white" do %>
                 ✕
@@ -33,7 +33,7 @@
                             data: { video: true } %>
 
                           <button type="button"
-                            class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/50 px-3 py-2 text-white hover:bg-black/70">
+                            class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/35 px-3 py-2 text-white hover:bg-black/70">
                             🔇
                           </button>
                         </div>
@@ -59,7 +59,7 @@
                                     data: { video: true } %>
 
                                   <button type="button"
-                                    class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/50 px-3 py-2 text-white hover:bg-black/70">
+                                    class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/35 px-3 py-2 text-white hover:bg-black/70">
                                     🔇
                                   </button>
                                 </div>
@@ -73,7 +73,7 @@
                         data-action="click->carousel#prev"
                         class="carousel-btn absolute left-3 top-1/2 z-10 -translate-y-1/2
                               flex h-9 w-9 items-center justify-center
-                              rounded-full bg-black/50 text-white shadow-lg
+                              rounded-full bg-black/35 text-white shadow-lg
                               backdrop-blur
                               transition-all duration-200 ease-out hover:scale-105 hover:bg-zinc-600/90 active:scale-95
                               opacity-0 group-hover:opacity-100">
@@ -86,7 +86,7 @@
                         data-action="click->carousel#next"
                         class="carousel-btn absolute right-3 top-1/2 z-10 -translate-y-1/2
                               flex h-9 w-9 items-center justify-center
-                              rounded-full bg-black/50 text-white shadow-lg
+                              rounded-full bg-black/35 text-white shadow-lg
                               backdrop-blur
                               transition-all duration-200 ease-out hover:scale-105 hover:bg-zinc-600/90 active:scale-95
                               opacity-0 group-hover:opacity-100">
@@ -173,3 +173,5 @@
     </div>
   </div>
 </div>
+
+

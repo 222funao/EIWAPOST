@@ -126,3 +126,59 @@ html::-webkit-scrollbar-thumb:hover {
 .notifications-scroll::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, rgba(168, 85, 247, 0.75), rgba(59, 130, 246, 0.75));
 }
+/* Temas globales (fondos oscuros) */
+body.theme-obsidian {
+  background-color: #0a0b12;
+  background-image:
+    radial-gradient(1200px circle at 15% 10%, rgba(59, 37, 94, 0.35), transparent 55%),
+    radial-gradient(900px circle at 85% 5%, rgba(24, 38, 74, 0.45), transparent 50%),
+    linear-gradient(180deg, #0a0b12 0%, #090a10 55%, #06060a 100%);
+  background-attachment: fixed;
+}
+
+body.theme-violet {
+  background-color: #0b0a12;
+  background-image:
+    radial-gradient(1200px circle at 20% 15%, rgba(76, 29, 149, 0.45), transparent 58%),
+    radial-gradient(900px circle at 80% 10%, rgba(88, 28, 135, 0.35), transparent 50%),
+    linear-gradient(180deg, #0b0a12 0%, #090810 60%, #05040a 100%);
+  background-attachment: fixed;
+}
+
+body.theme-midnight {
+  background-color: #070a12;
+  background-image:
+    radial-gradient(1100px circle at 25% 12%, rgba(15, 23, 42, 0.75), transparent 58%),
+    radial-gradient(800px circle at 75% 8%, rgba(2, 6, 23, 0.65), transparent 55%),
+    linear-gradient(180deg, #070a12 0%, #060910 55%, #04050a 100%);
+  background-attachment: fixed;
+}
+
+body.theme-ember {
+  background-color: #0c0708;
+  background-image:
+    radial-gradient(1200px circle at 18% 12%, rgba(127, 29, 29, 0.4), transparent 58%),
+    radial-gradient(900px circle at 82% 10%, rgba(69, 10, 10, 0.5), transparent 52%),
+    linear-gradient(180deg, #0c0708 0%, #0a0607 55%, #050303 100%);
+  background-attachment: fixed;
+}
+
+.app-bg {
+  background-color: transparent;
+}
+
+body.theme-obsidian .sidebar-bg {
+  background-color: #0f111a;
+}
+
+body.theme-violet .sidebar-bg {
+  background-color: #140c1f;
+}
+
+body.theme-midnight .sidebar-bg {
+  background-color: #0a0e17;
+}
+
+body.theme-ember .sidebar-bg {
+  background-color: #14090b;
+}

@@ -13,14 +13,28 @@ class FeedController < ApplicationController
                      .where("posts.caption ILIKE :q OR users.username ILIKE :q", q: "%#{escaped}%")
     end
 
+    post_scope = current_user.feed_posts_scope.presence || "all"
+    include_own_posts = current_user.feed_include_own_posts.nil? ? true : current_user.feed_include_own_posts
+
+    if post_scope == "following"
+      allowed_ids = current_user.following_ids
+      allowed_ids << current_user.id if include_own_posts
+      @posts = @posts.where(user_id: allowed_ids)
+    elsif !include_own_posts
+      @posts = @posts.where.not(user_id: current_user.id)
+    end
+
     @posts = @posts.order(created_at: :desc)
 
-    following_ids = (current_user.following_ids + [current_user.id]).uniq
     friend_ids = current_user.friend_ids
+    story_scope = current_user.feed_stories_scope.presence || "all"
     stories = Story.active
                    .includes(:user, media_attachment: :blob)
-                   .where(user_id: following_ids)
                    .order(created_at: :asc)
+    if story_scope == "following"
+      allowed_story_ids = (current_user.following_ids + [current_user.id]).uniq
+      stories = stories.where(user_id: allowed_story_ids)
+    end
 
     @story_groups = stories.group_by(&:user)
     liked_story_ids = StoryLike.where(user_id: current_user.id, story_id: stories.map(&:id)).pluck(:story_id)

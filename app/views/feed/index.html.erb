@@ -1,4 +1,4 @@
-<div class="min-h-screen w-full bg-zinc-950 text-zinc-100">
+<div class="min-h-screen w-full text-zinc-100 app-bg">
   <div class="w-full pr-6 lg:pr-12 2xl:pr-6 pl-0">
 
     <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_1fr_340px]">
@@ -61,14 +61,14 @@
 
                 <button type="button"
                         data-action="click->stories-viewer#prev"
-                        class="absolute left-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white shadow-lg backdrop-blur transition hover:scale-105 hover:bg-black/60">
+                        class="absolute left-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white shadow-lg backdrop-blur transition hover:scale-105 hover:bg-black/45">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 18l-6-6 6-6" />
                   </svg>
                 </button>
                 <button type="button"
                         data-action="click->stories-viewer#next"
-                        class="absolute right-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white shadow-lg backdrop-blur transition hover:scale-105 hover:bg-black/60">
+                        class="absolute right-4 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white shadow-lg backdrop-blur transition hover:scale-105 hover:bg-black/45">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
                   </svg>
@@ -90,19 +90,19 @@
   <div class="flex items-center gap-2">
     <img data-stories-viewer-target="avatar" class="h-9 w-9 rounded-full object-cover" alt="" />
     <div class="text-sm font-semibold" data-stories-viewer-target="username"></div>
-    <div data-stories-viewer-target="time" class="rounded-full bg-black/40 px-2.5 py-1 text-sm text-white/95"></div>
+    <div data-stories-viewer-target="time" class="rounded-full bg-black/30 px-2.5 py-1 text-sm text-white/95"></div>
   </div>
   <div class="flex items-center gap-2">
     <button type="button"
             data-stories-viewer-target="pauseToggle"
             data-action="click->stories-viewer#togglePause"
-            class="rounded-full bg-black/40 px-2.5 py-1.5 text-sm text-white/95 hover:bg-black/60">
+            class="rounded-full bg-black/30 px-2.5 py-1.5 text-sm text-white/95 hover:bg-black/45">
       ⏸
     </button>
     <button type="button"
             data-stories-viewer-target="soundToggle"
             data-action="click->stories-viewer#toggleSound"
-            class="rounded-full bg-black/40 px-2.5 py-1.5 text-sm text-white/95 hover:bg-black/60">
+            class="rounded-full bg-black/30 px-2.5 py-1.5 text-sm text-white/95 hover:bg-black/45">
       🔊
     </button>
   </div>
@@ -118,7 +118,7 @@
                       <div class="pointer-events-none absolute inset-x-0 bottom-0 z-20">
                         <div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/70 via-black/35 to-transparent"></div>
                         <div class="relative px-6 pb-20 pt-10 text-center">
-                          <div data-stories-viewer-target="description" class="mx-auto inline-block max-w-[280px] rounded-xl bg-black/40 px-3 py-1.5 text-sm text-white/95"></div>
+                          <div data-stories-viewer-target="description" class="mx-auto inline-block max-w-[280px] rounded-xl bg-black/30 px-3 py-1.5 text-sm text-white/95"></div>
                         </div>
                       </div>
 
@@ -127,7 +127,7 @@
                           <form data-stories-viewer-target="replyForm"
                                 data-action="submit->stories-viewer#submitReply"
                                 class="flex-1">
-                            <div class="flex items-center gap-2 rounded-full border border-white/10 bg-black/40 px-3 py-1.5 backdrop-blur">
+                            <div class="flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1.5 backdrop-blur">
                               <input data-stories-viewer-target="replyInput"
                                      type="text"
                                      name="message[body]"
@@ -150,7 +150,7 @@
                           <button type="button"
                                   data-stories-viewer-target="likeButton"
                                   data-action="click->stories-viewer#toggleLike"
-                                  class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white/90 hover:bg-black/60">
+                                  class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white/90 hover:bg-black/45">
                             <span data-stories-viewer-target="likeIcon" class="text-base leading-none">🤍</span>
                             <span data-stories-viewer-target="likeIconFilled" class="hidden text-base leading-none">❤️</span>
                           </button>
@@ -217,7 +217,7 @@
                       data: { video: true } %>
 
                     <button type="button"
-                      class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/50 px-3 py-2 text-white hover:bg-black/70">
+                      class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/35 px-3 py-2 text-white hover:bg-black/70">
                       🔇
                     </button>
                   </div>
@@ -244,7 +244,7 @@
                               data: { video: true } %>
 
                             <button type="button"
-                              class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/50 px-3 py-2 text-white hover:bg-black/70">
+                              class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/35 px-3 py-2 text-white hover:bg-black/70">
                               🔇
                             </button>
                           </div>
@@ -259,7 +259,7 @@
                   data-action="click->carousel#prev"
                   class="carousel-btn absolute left-3 top-1/2 z-10 -translate-y-1/2
                         flex h-9 w-9 items-center justify-center
-                        rounded-full bg-black/50 text-white shadow-lg
+                        rounded-full bg-black/35 text-white shadow-lg
                         backdrop-blur
                         transition-all duration-200 ease-out hover:scale-105 hover:bg-zinc-600/90 active:scale-95
                         opacity-0 group-hover:opacity-100">
@@ -272,7 +272,7 @@
                   data-action="click->carousel#next"
                   class="carousel-btn absolute right-3 top-1/2 z-10 -translate-y-1/2
                         flex h-9 w-9 items-center justify-center
-                        rounded-full bg-black/50 text-white shadow-lg
+                        rounded-full bg-black/35 text-white shadow-lg
                         backdrop-blur
                         transition-all duration-200 ease-out hover:scale-105 hover:bg-zinc-600/90 active:scale-95
                         opacity-0 group-hover:opacity-100">
@@ -414,7 +414,7 @@
       </main>
 
       <!-- Derecha: perfil + sugerencias -->
-      <aside class="sticky top-0 hidden h-screen bg-zinc-950 py-6 pl-6 pr-8 lg:block w-[380px]">
+      <aside class="sticky top-0 hidden h-screen bg-transparent py-6 pl-6 pr-8 lg:block w-[380px]">
 
         <div class="space-y-4">
           <!-- Perfil -->
@@ -452,3 +452,6 @@
 
 </div>
 </div>
+
+
+

@@ -1,0 +1,100 @@
+<div class="min-h-screen w-full text-zinc-100 app-bg">
+  <div class="w-full pr-6 lg:pr-12 2xl:pr-6 pl-0">
+    <div class="grid min-h-screen grid-cols-1 gap-0 lg:grid-cols-[96px_1fr]">
+      <%= render "shared/sidebar" %>
+
+      <main class="py-8 pl-10 pr-10 lg:pl-29 lg:pr-10">
+        <div class="mx-auto w-full max-w-[920px]">
+          <div class="rounded-2xl border border-white/10 bg-zinc-900/30 p-6 sm:p-8">
+            <h1 class="text-2xl font-semibold">Personalizacion</h1>
+            <p class="mt-2 text-sm text-zinc-400">
+              Configura que quieres ver en tu feed.
+            </p>
+
+            <%= form_with model: current_user, url: personalizacion_path, method: :patch, class: "mt-8 space-y-8" do |f| %>
+              <section class="space-y-4">
+                <h2 class="text-lg font-semibold">Fondos</h2>
+
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <label class="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3 text-sm">
+                    <%= f.radio_button :feed_theme, "obsidian", checked: (current_user.feed_theme.presence || "obsidian") == "obsidian", class: "h-4 w-4" %>
+                    <span class="flex flex-1 items-center justify-between gap-3">
+                      <span>Obsidiana</span>
+                      <span class="h-6 w-12 rounded-full bg-gradient-to-r from-black via-slate-900 to-indigo-950"></span>
+                    </span>
+                  </label>
+                  <label class="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3 text-sm">
+                    <%= f.radio_button :feed_theme, "violet", checked: (current_user.feed_theme.presence || "obsidian") == "violet", class: "h-4 w-4" %>
+                    <span class="flex flex-1 items-center justify-between gap-3">
+                      <span>Violeta</span>
+                      <span class="h-6 w-12 rounded-full bg-gradient-to-r from-slate-950 via-purple-950 to-fuchsia-950"></span>
+                    </span>
+                  </label>
+                  <label class="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3 text-sm">
+                    <%= f.radio_button :feed_theme, "midnight", checked: (current_user.feed_theme.presence || "obsidian") == "midnight", class: "h-4 w-4" %>
+                    <span class="flex flex-1 items-center justify-between gap-3">
+                      <span>Medianoche</span>
+                      <span class="h-6 w-12 rounded-full bg-gradient-to-r from-black via-blue-950 to-slate-900"></span>
+                    </span>
+                  </label>
+                  <label class="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 p-3 text-sm">
+                    <%= f.radio_button :feed_theme, "ember", checked: (current_user.feed_theme.presence || "obsidian") == "ember", class: "h-4 w-4" %>
+                    <span class="flex flex-1 items-center justify-between gap-3">
+                      <span>Carmin</span>
+                      <span class="h-6 w-12 rounded-full bg-gradient-to-r from-black via-red-950 to-rose-950"></span>
+                    </span>
+                  </label>
+                </div>
+              </section>
+
+              <section class="space-y-4">
+                <h2 class="text-lg font-semibold">Posts</h2>
+
+                <div class="space-y-3">
+                  <label class="flex items-center gap-3 text-sm">
+                    <%= f.radio_button :feed_posts_scope, "all", checked: (current_user.feed_posts_scope.presence || "all") == "all", class: "h-4 w-4" %>
+                    <span>Todos los posts existentes</span>
+                  </label>
+                  <label class="flex items-center gap-3 text-sm">
+                    <%= f.radio_button :feed_posts_scope, "following", checked: (current_user.feed_posts_scope.presence || "all") == "following", class: "h-4 w-4" %>
+                    <span>Solo posts de las personas a las que sigues</span>
+                  </label>
+                </div>
+
+                <label class="mt-3 flex items-center gap-3 text-sm">
+                  <%= f.check_box :feed_include_own_posts, checked: current_user.feed_include_own_posts.nil? ? true : current_user.feed_include_own_posts, class: "h-4 w-4" %>
+                  <span>Mostrar mis propios posts</span>
+                </label>
+              </section>
+
+              <section class="space-y-4">
+                <h2 class="text-lg font-semibold">Historias</h2>
+
+                <div class="space-y-3">
+                  <label class="flex items-center gap-3 text-sm">
+                    <%= f.radio_button :feed_stories_scope, "all", checked: (current_user.feed_stories_scope.presence || "all") == "all", class: "h-4 w-4" %>
+                    <span>Todas las historias</span>
+                  </label>
+                  <label class="flex items-center gap-3 text-sm">
+                    <%= f.radio_button :feed_stories_scope, "following", checked: (current_user.feed_stories_scope.presence || "all") == "following", class: "h-4 w-4" %>
+                    <span>Historias de las personas a las que sigues</span>
+                  </label>
+                </div>
+
+                <p class="text-xs text-zinc-400">
+                  Tus historias siempre aparecen.
+                </p>
+              </section>
+
+              <div class="flex items-center gap-3">
+                <%= f.submit "Guardar cambios", class: "rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 active:scale-[0.99]" %>
+                <%= link_to "Volver al feed", root_path, class: "text-sm text-zinc-300 hover:text-white hover:underline" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+

@@ -81,7 +81,7 @@
           <% media_audios.each do |aud| %>
             <div
               data-controller="message-audio"
-              class="w-[420px] max-w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2 sm:w-[300px]">
+              class="w-[420px] max-w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 sm:w-[300px]">
               <audio
                 data-message-audio-target="audio"
                 data-type="<%= aud.content_type %>"
@@ -124,3 +124,4 @@
     <% end %>
   </div>
 </div>
+
