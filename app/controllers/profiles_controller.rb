@@ -23,8 +23,16 @@ class ProfilesController < ApplicationController
   def update
     @user = current_user
     @is_owner = true
+    previous_invisible = @user.invisible?
 
     if @user.update(profile_params)
+      if previous_invisible != @user.invisible?
+        if @user.invisible?
+          PresenceTracker.mark_invisible(@user)
+        else
+          PresenceTracker.heartbeat(@user)
+        end
+      end
       redirect_to profile_path, notice: "Perfil actualizado"
     else
       @posts = @user.posts.order(created_at: :desc)
@@ -37,7 +45,7 @@ class ProfilesController < ApplicationController
   private
 
   def profile_params
-    params.require(:user).permit(:avatar, :bio)
+    params.require(:user).permit(:avatar, :bio, :invisible)
   end
 
   def liked_posts_for(user)

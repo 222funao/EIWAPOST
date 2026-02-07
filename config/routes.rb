@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   # ✅ tu perfil (sin id)
   get  "/profile", to: "profiles#me", as: :profile
   patch "/profile", to: "profiles#update"
+  post "/presence/heartbeat", to: "presences#heartbeat", as: :presence_heartbeat
+  post "/presence/offline", to: "presences#offline", as: :presence_offline
 
   # (opcional) si no usas edit propio, bórralo:
   # get "/profile/edit", to: "profiles#edit", as: :edit_profile
@@ -25,10 +27,12 @@ Rails.application.routes.draw do
   end
 
   resources :posts, only: [:new, :create, :show] do
+    post :share, on: :member
     resources :comments, only: [:create, :destroy]
     resources :users, only: [:show]
     resource :like, only: [:create, :destroy]
   end
+  get "/tendencias/:name", to: "trends#show", as: :trend
   resources :stories, only: [:create, :show] do
     resource :like, only: [:create, :destroy], controller: "story_likes"
   end

@@ -1,0 +1,78 @@
+<div data-controller="share-menu" class="relative">
+  <button
+    type="button"
+    data-action="click->share-menu#open"
+    class="hover:scale-[1.05] active:scale-[0.95] inline-flex cursor-pointer items-center gap-2 rounded-xl px-3 py-1.5 text-lg leading-none text-zinc-300 transition hover:bg-white/10 hover:text-white"
+    title="Compartir post">
+    <span class="leading-none text-[18px]">&#128228;</span>
+  </button>
+
+  <div
+    data-share-menu-target="modal"
+    class="fixed inset-0 z-[9999] hidden bg-black/70 p-4 backdrop-blur-sm">
+
+    <div class="mx-auto mt-[12vh] w-full max-w-sm rounded-2xl border border-white/10 bg-zinc-950/75 p-4 shadow-2xl">
+      <div class="mb-4 flex items-center justify-between border-b border-white/10 pb-3">
+        <div>
+          <div class="text-base font-semibold text-zinc-100">Enviar post</div>
+          <div class="text-xs text-zinc-400">Selecciona uno o varios amigos o grupos</div>
+        </div>
+        <button
+          type="button"
+          data-share-menu-target="closeButton"
+          class="rounded-lg px-2 py-1 text-zinc-400 transition hover:bg-white/5 hover:text-white">
+          x
+        </button>
+      </div>
+
+      <% if @share_friends.present? || @share_groups.present? %>
+        <%= form_with url: share_post_path(post, format: :turbo_stream), method: :post, class: "space-y-4", data: { share_menu_target: "form" } do %>
+          <div class="max-h-64 space-y-3 overflow-y-auto pr-1">
+            <% if @share_groups.present? %>
+              <div class="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Grupos</div>
+              <% @share_groups.each do |group| %>
+                <label class="group flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-zinc-900/55 px-3 py-2 transition hover:border-white/20 hover:bg-zinc-900/75">
+                  <%= check_box_tag "group_ids[]", group.id, false, class: "peer sr-only" %>
+                  <span class="grid h-4 w-4 place-items-center rounded border border-white/25 bg-zinc-900 text-[10px] text-white/0 transition peer-checked:border-sky-500/70 peer-checked:bg-sky-500/70 peer-checked:text-white">&#10003;</span>
+                  <span class="h-8 w-8 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+                    <% if group.avatar.attached? %>
+                      <%= image_tag group.avatar, class: "h-full w-full object-cover" %>
+                    <% else %>
+                      <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
+                    <% end %>
+                  </span>
+                  <span class="text-sm font-medium text-zinc-200"><%= group.name %></span>
+                </label>
+              <% end %>
+            <% end %>
+
+            <% if @share_friends.present? %>
+              <div class="text-[11px] font-semibold uppercase tracking-wide text-zinc-400">Amigos</div>
+              <% @share_friends.each do |friend| %>
+                <label class="group flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-zinc-900/55 px-3 py-2 transition hover:border-white/20 hover:bg-zinc-900/75">
+                  <%= check_box_tag "friend_ids[]", friend.id, false, class: "peer sr-only" %>
+                  <span class="grid h-4 w-4 place-items-center rounded border border-white/25 bg-zinc-900 text-[10px] text-white/0 transition peer-checked:border-sky-500/70 peer-checked:bg-sky-500/70 peer-checked:text-white">&#10003;</span>
+                  <span class="h-8 w-8 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+                    <% if friend.avatar.attached? %>
+                      <%= image_tag friend.avatar, class: "h-full w-full object-cover" %>
+                    <% else %>
+                      <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
+                    <% end %>
+                  </span>
+                  <span class="text-sm font-medium text-zinc-200"><%= friend.username %></span>
+                </label>
+              <% end %>
+            <% end %>
+          </div>
+
+          <%= submit_tag "Enviar",
+            class: "w-full rounded-xl bg-white px-3 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-100 active:scale-[0.99]" %>
+        <% end %>
+      <% else %>
+        <div class="rounded-xl border border-white/10 bg-zinc-900/55 px-3 py-3 text-xs text-zinc-400">
+          No tienes amigos ni grupos para enviar este post.
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

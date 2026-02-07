@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["fileInput", "notice", "recordButton", "recordStatus"]
+  static targets = ["fileInput", "notice", "recordButton", "recordStatus", "previews"]
 
   connect() {
     this.mediaRecorder = null
@@ -15,6 +15,7 @@ export default class extends Controller {
 
   disconnect() {
     this.stopRecording(true)
+    this.clearPreviewUrls()
   }
 
   async checkMicAvailability() {
@@ -48,6 +49,95 @@ export default class extends Controller {
     } else {
       this.noticeTarget.classList.add("hidden")
     }
+
+    this.renderImagePreviews()
+  }
+
+  pasteImage(event) {
+    if (!this.hasFileInputTarget) return
+    const clipboardItems = Array.from(event.clipboardData?.items || [])
+    const imageFiles = clipboardItems
+      .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+      .map((item) => item.getAsFile())
+      .filter(Boolean)
+
+    if (imageFiles.length === 0) return
+    event.preventDefault()
+
+    const dataTransfer = new DataTransfer()
+    Array.from(this.fileInputTarget.files).forEach((file) => dataTransfer.items.add(file))
+
+    const timestamp = Date.now()
+    imageFiles.forEach((file, index) => {
+      const name = file.name && file.name.length > 0 ? file.name : `clipboard-${timestamp}-${index + 1}.png`
+      dataTransfer.items.add(new File([file], name, { type: file.type || "image/png" }))
+    })
+
+    this.fileInputTarget.files = dataTransfer.files
+    this.filesChanged()
+  }
+
+  removePreview(event) {
+    if (!this.hasFileInputTarget) return
+    const index = Number(event.currentTarget.dataset.fileIndex)
+    if (Number.isNaN(index)) return
+
+    const dataTransfer = new DataTransfer()
+    Array.from(this.fileInputTarget.files).forEach((file, fileIndex) => {
+      if (fileIndex !== index) dataTransfer.items.add(file)
+    })
+
+    this.fileInputTarget.files = dataTransfer.files
+    this.filesChanged()
+  }
+
+  renderImagePreviews() {
+    if (!this.hasPreviewsTarget || !this.hasFileInputTarget) return
+
+    this.clearPreviewUrls()
+    this.previewsTarget.innerHTML = ""
+
+    const files = Array.from(this.fileInputTarget.files)
+    const imageEntries = files
+      .map((file, index) => ({ file, index }))
+      .filter(({ file }) => file.type && file.type.startsWith("image/"))
+
+    if (imageEntries.length === 0) {
+      this.previewsTarget.classList.add("hidden")
+      return
+    }
+
+    imageEntries.forEach(({ file, index }) => {
+      const item = document.createElement("div")
+      item.className = "relative h-14 w-14 overflow-hidden rounded-xl border border-white/15 bg-black/40"
+
+      const image = document.createElement("img")
+      const objectUrl = URL.createObjectURL(file)
+      image.src = objectUrl
+      image.alt = "Vista previa"
+      image.dataset.objectUrl = objectUrl
+      image.className = "h-full w-full object-cover"
+
+      const removeButton = document.createElement("button")
+      removeButton.type = "button"
+      removeButton.textContent = "x"
+      removeButton.dataset.fileIndex = String(index)
+      removeButton.className = "absolute right-1 top-1 grid h-5 w-5 place-items-center rounded-full bg-black/75 text-[10px] font-semibold text-white hover:bg-black"
+      removeButton.addEventListener("click", (clickEvent) => this.removePreview(clickEvent))
+
+      item.appendChild(image)
+      item.appendChild(removeButton)
+      this.previewsTarget.appendChild(item)
+    })
+
+    this.previewsTarget.classList.remove("hidden")
+  }
+
+  clearPreviewUrls() {
+    if (!this.hasPreviewsTarget) return
+    this.previewsTarget.querySelectorAll("img[data-object-url]").forEach((image) => {
+      URL.revokeObjectURL(image.dataset.objectUrl)
+    })
   }
 
   async toggleRecording() {
@@ -189,6 +279,13 @@ export default class extends Controller {
     this.stream = null
   }
 
+  submitOnEnter(event) {
+    if (event.key !== "Enter" || event.shiftKey || event.isComposing) return
+
+    event.preventDefault()
+    this.element.requestSubmit()
+  }
+
   reset(event) {
     if (!event.detail.success) return
 
@@ -196,7 +293,7 @@ export default class extends Controller {
     if (textarea) textarea.value = ""
 
     if (this.hasFileInputTarget) this.fileInputTarget.value = ""
-    if (this.hasNoticeTarget) this.noticeTarget.classList.add("hidden")
+    this.filesChanged()
     if (this.hasRecordStatusTarget && (!this.hasRecordButtonTarget || !this.recordButtonTarget.disabled)) {
       this.recordStatusTarget.classList.add("hidden")
     }

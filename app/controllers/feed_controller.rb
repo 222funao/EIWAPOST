@@ -3,6 +3,8 @@ class FeedController < ApplicationController
 
   def index
     Story.cleanup_expired!
+    @share_friends = current_user.friends.includes(avatar_attachment: :blob).order(:username)
+    @share_groups = current_user.groups.includes(avatar_attachment: :blob).order(:name)
 
     @query = params[:q].to_s.strip
     @posts = Post.includes(:user, media_attachments: :blob, comments: :user)
@@ -25,6 +27,7 @@ class FeedController < ApplicationController
     end
 
     @posts = @posts.order(created_at: :desc)
+    @top_trends = Trend.top_with_post_counts(5)
 
     friend_ids = current_user.friend_ids
     story_scope = current_user.feed_stories_scope.presence || "all"

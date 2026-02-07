@@ -4,7 +4,7 @@ class Story < ApplicationRecord
   has_many :story_likes, dependent: :destroy
 
   validates :media, presence: true
-  validates :description, presence: true, length: { maximum: 140 }
+  validates :description, length: { maximum: 140 }, allow_blank: true
   validate :media_type_allowed
 
   scope :active, -> { where("expires_at > ?", Time.current) }

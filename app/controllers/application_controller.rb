@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :load_notifications, if: :user_signed_in?
   before_action :load_message_indicator, if: :user_signed_in?
+  before_action :clear_stale_active_conversation_cache, if: :user_signed_in?
   helper_method :has_unread_messages?
   helper_method :messages_page?
 
@@ -27,5 +28,16 @@ class ApplicationController < ActionController::Base
 
   def messages_page?
     controller_name == "messages"
+  end
+
+  def clear_stale_active_conversation_cache
+    return unless request.get? || request.head?
+    return if controller_name == "messages" && params[:user_id].present?
+
+    Rails.cache.delete(active_conversation_cache_key(current_user.id))
+  end
+
+  def active_conversation_cache_key(user_id)
+    "active_conversation:user:#{user_id}"
   end
 end

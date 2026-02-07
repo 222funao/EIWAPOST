@@ -6,15 +6,16 @@ class MessagesController < ApplicationController
     @groups = current_user.groups.order(:name)
     @active_group = active_group_from_params(@groups)
     @active_user = @active_group ? nil : active_user_from_params(@friends)
+    track_active_conversation_for_current_user
 
     if @active_group
       load_group_messages
     elsif @active_user
-      @conversation = Conversation.find_or_create_between!(current_user, @active_user)
+      @conversation ||= Conversation.find_or_create_between!(current_user, @active_user)
       @messages =
         @conversation
           .messages
-          .includes(:sender, :story, story: { media_attachment: :blob }, media_attachments: :blob)
+          .includes(:sender, :story, :post, story: { media_attachment: :blob }, post: [:user, { media_attachments: :blob }], media_attachments: :blob)
           .order(:created_at)
       unread_scope = @conversation.messages.where(sender_id: @active_user.id, read_at: nil)
       @unread_count = unread_scope.count
@@ -132,7 +133,7 @@ class MessagesController < ApplicationController
     @messages =
       @active_group
         .messages
-        .includes(:sender, :story, story: { media_attachment: :blob }, media_attachments: :blob)
+        .includes(:sender, :story, :post, story: { media_attachment: :blob }, post: [:user, { media_attachments: :blob }], media_attachments: :blob)
         .order(:created_at)
 
     membership = @active_group.group_memberships.find { |m| m.user_id == current_user.id }
@@ -188,5 +189,20 @@ class MessagesController < ApplicationController
     return unless story.user_id == @active_user.id
 
     @message.story = story
+  end
+
+  def track_active_conversation_for_current_user
+    key = active_conversation_cache_key(current_user.id)
+
+    if @active_user
+      @conversation ||= Conversation.find_or_create_between!(current_user, @active_user)
+      Rails.cache.write(key, @conversation.id, expires_in: 10.minutes)
+    else
+      Rails.cache.delete(key)
+    end
+  end
+
+  def active_conversation_cache_key(user_id)
+    "active_conversation:user:#{user_id}"
   end
 end

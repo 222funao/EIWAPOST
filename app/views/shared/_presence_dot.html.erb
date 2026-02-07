@@ -1,0 +1,7 @@
+<% size_class = local_assigns.fetch(:size_class, "h-3 w-3") %>
+<% offset_class = local_assigns.fetch(:offset_class, "-bottom-0.5 -right-0.5") %>
+<% border_class = local_assigns.fetch(:border_class, "border-2") %>
+<span
+  data-presence-dot-for="<%= user.id %>"
+  class="absolute <%= offset_class %> z-20 <%= size_class %> rounded-full <%= border_class %> border-zinc-900 bg-emerald-400 <%= PresenceTracker.online_visible?(user) ? '' : 'hidden' %>">
+</span>

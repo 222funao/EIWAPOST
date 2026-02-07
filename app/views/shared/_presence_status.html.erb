@@ -1,0 +1,6 @@
+<span
+  data-presence-text-for="<%= user.id %>"
+  data-presence-online="<%= PresenceTracker.online_visible?(user) ? 'true' : 'false' %>"
+  data-presence-last-seen-at="<%= user.last_seen_at&.iso8601 %>">
+  <%= presence_status_text(user) %>
+</span>

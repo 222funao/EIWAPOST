@@ -32,12 +32,15 @@
                   class="flex w-20 flex-col items-center gap-2">
                   <div data-story-ring class="rounded-full bg-gradient-to-tr from-fuchsia-500 via-rose-500 to-amber-400 p-[2px]">
                     <div class="h-16 w-16 rounded-full bg-zinc-950 p-[2px]">
-                      <div class="h-full w-full overflow-hidden rounded-full bg-zinc-800">
-                        <% if user.avatar.attached? %>
-                          <%= image_tag user.avatar, class: "h-full w-full object-cover" %>
-                        <% else %>
-                          <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
-                        <% end %>
+                      <div class="relative h-full w-full">
+                        <div class="h-full w-full overflow-hidden rounded-full bg-zinc-800">
+                          <% if user.avatar.attached? %>
+                            <%= image_tag user.avatar, class: "h-full w-full object-cover" %>
+                          <% else %>
+                            <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
+                          <% end %>
+                        </div>
+                        <%= render "shared/presence_dot", user: user %>
                       </div>
                     </div>
                   </div>
@@ -166,248 +169,7 @@
 
 <!-- Posts -->
 <section class="mt-6 space-y-6 mx-auto w-full max-w-[920px]">
-  <% @posts.each do |post| %>
-
-    <!-- Contenedor: post + panel comentarios -->
-    <div data-controller="post-comments"
-     class="relative lg:flex lg:items-stretch lg:justify-center">
-
-      <!-- Post (ancho fijo, no se encoge) -->
-      <div data-post-comments-target="post" class="lg:w-[520px] lg:shrink-0 transition-transform duration-300 ease-out">
-        <article class="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/30">
-          <div class="flex items-center justify-between px-4 py-3">
-            <div class="flex items-center gap-3">
-              <div class="h-9 w-9 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
-  <% if post.user.avatar.attached? %>
-    <%= image_tag post.user.avatar, class: "h-full w-full object-cover" %>
-  <% else %>
-    <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
-  <% end %>
-</div>
-
-
-              <div>
-                <div class="text-base font-semibold"><%= link_to post.user.username,
-            public_profile_path(post.user),
-            class: "hover:underline" %></div>
-                <div class="text-xs text-zinc-400">
-                  <%= link_to "hace #{time_ago_in_words(post.created_at, locale: :es)}", post_path(post), class: "hover:underline" %>
-                </div>
-              </div>
-            </div>
-            <button class="rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white">⋯</button>
-          </div>
-
-          <!-- Media -->
-          <% if post.media.attached? %>
-            <% if post.media.count == 1 %>
-              <% file = post.media.first %>
-
-              <div class="relative w-full overflow-hidden bg-black aspect-[6/7]">
-                <% if file.content_type.start_with?("image/") %>
-                  <%= image_tag file, class: "absolute inset-0 h-full w-full object-cover" %>
-                <% else %>
-                  <div class="video-wrapper absolute inset-0">
-                    <%= video_tag url_for(file),
-                      class: "h-full w-full object-cover",
-                      autoplay: true,
-                      loop: true,
-                      muted: true,
-                      playsinline: true,
-                      data: { video: true } %>
-
-                    <button type="button"
-                      class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/35 px-3 py-2 text-white hover:bg-black/70">
-                      🔇
-                    </button>
-                  </div>
-                <% end %>
-              </div>
-
-            <% else %>
-              <!-- Carrusel -->
-              <div data-controller="carousel" class="relative group">
-                <div data-carousel-target="track" class="flex w-full overflow-hidden scroll-smooth">
-                  <% post.media.each do |file| %>
-                    <div class="w-full shrink-0" data-slide>
-                      <div class="relative w-full overflow-hidden bg-black aspect-[6/7]">
-                        <% if file.content_type.start_with?("image/") %>
-                          <%= image_tag file, class: "absolute inset-0 h-full w-full object-cover" %>
-                        <% else %>
-                          <div class="video-wrapper absolute inset-0">
-                            <%= video_tag url_for(file),
-                              class: "h-full w-full object-cover",
-                              autoplay: true,
-                              loop: true,
-                              muted: true,
-                              playsinline: true,
-                              data: { video: true } %>
-
-                            <button type="button"
-                              class="mute-btn absolute right-3 bottom-3 rounded-full bg-black/35 px-3 py-2 text-white hover:bg-black/70">
-                              🔇
-                            </button>
-                          </div>
-                        <% end %>
-                      </div>
-                    </div>
-                  <% end %>
-                </div>
-
-                <!-- Botones carrusel -->
-                <button type="button"
-                  data-action="click->carousel#prev"
-                  class="carousel-btn absolute left-3 top-1/2 z-10 -translate-y-1/2
-                        flex h-9 w-9 items-center justify-center
-                        rounded-full bg-black/35 text-white shadow-lg
-                        backdrop-blur
-                        transition-all duration-200 ease-out hover:scale-105 hover:bg-zinc-600/90 active:scale-95
-                        opacity-0 group-hover:opacity-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-
-                <button type="button"
-                  data-action="click->carousel#next"
-                  class="carousel-btn absolute right-3 top-1/2 z-10 -translate-y-1/2
-                        flex h-9 w-9 items-center justify-center
-                        rounded-full bg-black/35 text-white shadow-lg
-                        backdrop-blur
-                        transition-all duration-200 ease-out hover:scale-105 hover:bg-zinc-600/90 active:scale-95
-                        opacity-0 group-hover:opacity-100">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-
-                <!-- Dots -->
-                <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
-                  <% post.media.count.times do |i| %>
-                    <button type="button"
-                      data-carousel-target="dot"
-                      data-action="click->carousel#go"
-                      data-carousel-index-param="<%= i %>"
-                      class="h-2 w-2 rounded-full bg-white opacity-40">
-                    </button>
-                  <% end %>
-                </div>
-              </div>
-            <% end %>
-          <% end %>
-
-          <!-- Caption + acciones -->
-          <div class="px-4 py-3">
-            <% if post.caption.present? %>
-              <div class="text-base text-zinc-200">
-                <span class="font-semibold"><%= link_to post.user.username,
-            public_profile_path(post.user),
-            class: "hover:underline" %></span>
-                <%= render_with_mentions(post.caption) %>
-              </div>
-            <% end %>
-
-            <!-- Botón comentarios -->
-
-
-<div class="mt-3 flex items-center gap-3">
-  <%= render "posts/like_button", post: post %>
-
-
-<% base = "hover:scale-[1.05] active:scale-[0.95] inline-flex items-center gap-2 rounded-xl px-3 py-1.5 text-lg leading-none hover:bg-white/10 transition text-zinc-300 hover:text-white" %>
-
-<button type="button"
-  data-action="click->post-comments#toggle"
-  class="<%= base %>">
-
-  <span class="leading-none">💬</span>
-
-  <span
-    id="comments_count_post_<%= post.id %>"
-    class="text-sm leading-none">
-    <%= post.comments_count || post.comments.size %>
-  </span>
-
-</button>
-
-
-
-
-          </div>
-        </article>
-      </div>
-
-      <!-- Panel comentarios (derecha) -->
-      <aside
-  data-post-comments-target="panel"
-  class="hidden lg:flex lg:flex-col
-         absolute top-0 right-0 h-full
-         overflow-hidden rounded-2xl border bg-zinc-900/30
-         transition-all duration-300 ease-out
-         lg:w-0 lg:opacity-0 lg:border-transparent
-         pointer-events-none">
-
-
-        <div class="flex items-center justify-between px-4 py-3">
-          <div class="text-sm font-semibold text-zinc-200">Comentarios</div>
-          <button type="button"
-            data-action="click->post-comments#toggle"
-            class="rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white">✕</button>
-        </div>
-
-        <!-- lista comentarios -->
-        <div class="comments-scroll flex-1 min-h-0 px-4 pb-3 overflow-y-auto">
-
-          <div id="comments_list_post_<%= post.id %>" class="space-y-1 pr-1">
-            <% post.comments.order(created_at: :asc).each do |comment| %>
-              <div id="<%= dom_id(comment) %>" class="flex items-start justify-between gap-3 py-2">
-                <div class="min-w-0">
-                  <div class="flex items-start gap-2 min-w-0">
-                    <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
-                      <% if comment.user.avatar.attached? %>
-                        <%= image_tag comment.user.avatar, class: "h-full w-full object-cover" %>
-                      <% else %>
-                        <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
-                      <% end %>
-                    </span>
-                    <div class="min-w-0 text-sm leading-snug">
-                      <%= link_to comment.user.username,
-                        public_profile_path(comment.user),
-                        class: "font-semibold text-zinc-200 hover:underline" %>
-                      <span class="text-zinc-300 break-words"><%= render_with_mentions(comment.body) %></span>
-                    </div>
-                  </div>
-                </div>
-
-                <% if comment.user_id == current_user.id %>
-                  <%= button_to "Eliminar",
-                    post_comment_path(post, comment),
-                    method: :delete,
-                    form: { data: { turbo_confirm: "¿Eliminar comentario?" } },
-                    class: "shrink-0 rounded-lg px-2 py-1 text-xs text-zinc-400 hover:bg-white/5 hover:text-white" %>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        </div>
-
-        <!-- form -->
-        <div class="mt-auto border-t border-white/10 px-4 py-3">
-          <div id="comment_form_post_<%= post.id %>">
-            <%= form_with model: [post, Comment.new], class: "flex items-center gap-2" do |f| %>
-              <%= f.text_field :body,
-                placeholder: "Escribe un comentario...",
-                class: "w-full rounded-xl border border-white/10 bg-zinc-950/40 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
-
-              <%= f.submit "Enviar",
-                class: "rounded-xl bg-white px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 active:scale-[0.99]" %>
-            <% end %>
-          </div>
-        </div>
-      </aside>
-
-    </div>
-  <% end %>
+  <%= render partial: "posts/feed_post", collection: @posts, as: :post %>
 </section>
 
 
@@ -439,11 +201,23 @@
             </div>
           </div>
 
-          <!-- Sugerencias -->
-          
+          <div class="rounded-2xl border border-white/10 bg-zinc-900/30 p-4">
+            <div class="text-sm font-semibold text-zinc-200">Tendencias</div>
+            <div class="mt-3 space-y-3">
+              <% @top_trends.each do |trend| %>
+                <%= link_to trend_path(trend.name), class: "block rounded-xl px-3 py-2 hover:bg-white/5" do %>
+                  <div class="text-sm font-medium text-zinc-100">#<%= trend.name %></div>
+                  <div class="text-xs text-zinc-400"><%= trend.posts_count %> publicaciones</div>
+                <% end %>
+              <% end %>
+              <% if @top_trends.blank? %>
+                <div class="text-xs text-zinc-500">Todavia no hay tendencias.</div>
+              <% end %>
+            </div>
+          </div>
 
           <div class="px-1 text-xs text-zinc-500">
-            © <%= Time.current.year %> EIWAPOST
+            (c) <%= Time.current.year %> EIWAPOST
           </div>
         </div>
       </aside>
@@ -452,6 +226,7 @@
 
 </div>
 </div>
+
 
 
 

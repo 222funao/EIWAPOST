@@ -1,5 +1,5 @@
 <% notifications.each do |notification| %>
-  <div data-notification-id="<%= notification.id %>" class="flex items-center justify-between gap-2 rounded-xl bg-white/5 px-2 py-2">
+  <div data-notification-id="<%= notification.id %>" class="flex items-center justify-between gap-2 rounded-xl bg-zinc-900/95 px-2 py-2">
     <div class="min-w-0 text-xs text-zinc-200">
       <div class="truncate">
         <% if notification.group_count.to_i > 1 && %w[like comment story_like].include?(notification.action) %>

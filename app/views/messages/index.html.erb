@@ -58,6 +58,8 @@
                           <% sender_label = last_message.sender_id == current_user.id ? "Tu" : last_message.sender.username %>
                           <% if last_message.body.present? %>
                             <%= sender_label %>: <%= truncate(last_message.body, length: 42) %>
+                          <% elsif last_message.post.present? %>
+                            <%= sender_label %>: Post compartido
                           <% elsif last_message.media.attached? %>
                             <%= sender_label %>: Archivo adjunto
                           <% else %>
@@ -89,12 +91,15 @@
                   class: "flex items-center justify-between gap-4 rounded-2xl px-4 py-2
                           #{is_active ? "bg-white/10" : "hover:bg-white/5"}" do %>
                   <div class="flex items-center gap-4 min-w-0">
-                    <div class="h-12 w-12 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
-                      <% if friend.avatar.attached? %>
-                        <%= image_tag friend.avatar, class: "h-full w-full object-cover" %>
-                      <% else %>
-                        <%= image_tag "avatars/default.png", class: "h-full w-full object-cover opacity-90" %>
-                      <% end %>
+                    <div class="relative h-12 w-12">
+                      <div class="h-full w-full overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+                        <% if friend.avatar.attached? %>
+                          <%= image_tag friend.avatar, class: "h-full w-full object-cover" %>
+                        <% else %>
+                          <%= image_tag "avatars/default.png", class: "h-full w-full object-cover opacity-90" %>
+                        <% end %>
+                      </div>
+                      <%= render "shared/presence_dot", user: friend %>
                     </div>
                     <div class="min-w-0">
                       <div class="text-base font-semibold text-zinc-100 truncate"><%= friend.username %></div>
@@ -107,6 +112,8 @@
                           <% if last_message.sender_id == current_user.id %>
                             <% if last_message.body.present? %>
                               Tu: <%= truncate(last_message.body, length: 42) %>
+                            <% elsif last_message.post.present? %>
+                              Tu: Post compartido
                             <% elsif last_message.media.attached? %>
                               Tu: Archivo adjunto
                             <% else %>
@@ -115,6 +122,8 @@
                           <% else %>
                             <% if last_message.body.present? %>
                               <%= truncate(last_message.body, length: 42) %>
+                            <% elsif last_message.post.present? %>
+                              Post compartido
                             <% elsif last_message.media.attached? %>
                               Archivo adjunto
                             <% else %>
@@ -222,16 +231,19 @@
             <header class="flex items-center justify-between border-b border-white/10 px-6 py-4">
               <%= link_to public_profile_path(@active_user),
                 class: "flex items-center gap-3 hover:opacity-90" do %>
-                <div class="h-10 w-10 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
-                  <% if @active_user.avatar.attached? %>
-                    <%= image_tag @active_user.avatar, class: "h-full w-full object-cover" %>
-                  <% else %>
-                    <%= image_tag "avatars/default.png", class: "h-full w-full object-cover opacity-90" %>
-                  <% end %>
+                <div class="relative h-10 w-10">
+                  <div class="h-full w-full overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+                    <% if @active_user.avatar.attached? %>
+                      <%= image_tag @active_user.avatar, class: "h-full w-full object-cover" %>
+                    <% else %>
+                      <%= image_tag "avatars/default.png", class: "h-full w-full object-cover opacity-90" %>
+                    <% end %>
+                  </div>
+                  <%= render "shared/presence_dot", user: @active_user %>
                 </div>
                 <div>
                   <div class="text-base font-semibold text-zinc-100"><%= @active_user.username %></div>
-                  <div class="text-xs text-zinc-500">Amigos</div>
+                  <div class="text-xs text-zinc-500"><%= render "shared/presence_status", user: @active_user %></div>
                 </div>
               <% end %>
               <div class="text-xs text-zinc-400">Mensajes privados</div>

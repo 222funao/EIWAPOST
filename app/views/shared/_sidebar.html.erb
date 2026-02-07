@@ -58,25 +58,6 @@
     Buscar
   </span>
 </button>
-
-
-      
-
-      <%= link_to "#", class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3" do %>
-        <% if icon_style == "emoji" %>
-          <span class="text-xl">🎮</span>
-        <% else %>
-          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 10.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm6 2.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-7 1.5 2 2m0 0 2-2m-2 2v3m5-2h2a2 2 0 0 0 2-2v-1a3 3 0 0 0-3-3h-1.5M8.5 13H7a3 3 0 0 0-3 3v1a2 2 0 0 0 2 2h2"/></svg>
-        <% end %>
-        <span class="pointer-events-none absolute left-[54px] whitespace-nowrap text-lg text-zinc-200
-             opacity-0 -translate-x-2
-             transition duration-200 ease-out
-             group-hover:opacity-100 group-hover:translate-x-0">
-  Juegos
-</span>
-
-      <% end %>
-
       <%= link_to messages_path, class: "flex items-center rounded-xl p-3 hover:bg-white/5 justify-center group-hover:justify-start gap-0 group-hover:gap-3", data: { action: "click->message-indicator#clear" } do %>
 
         <span class="<%= icon_style == 'emoji' ? 'relative text-xl' : 'relative' %>">

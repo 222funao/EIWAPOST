@@ -27,8 +27,32 @@
       </div>
     <% end %>
 
+    <% if message.post.present? %>
+      <% preview_media = message.post.media.first %>
+      <div class="mb-2 flex items-center gap-3 rounded-2xl bg-black/30 p-2">
+        <%= link_to post_path(message.post), class: "relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-black" do %>
+          <% if preview_media&.content_type&.start_with?("image/") %>
+            <%= image_tag preview_media, class: "h-full w-full object-cover" %>
+          <% elsif preview_media&.content_type&.start_with?("video/") %>
+            <%= video_tag url_for(preview_media), class: "h-full w-full object-cover", muted: true, playsinline: true %>
+            <span class="pointer-events-none absolute inset-0 bg-black/20"></span>
+          <% else %>
+            <span class="grid h-full w-full place-items-center text-[10px] text-zinc-300">POST</span>
+          <% end %>
+        <% end %>
+        <div class="min-w-0 text-xs text-white/80">
+          <div class="truncate">
+            <%= is_me ? "Compartiste un post" : "Te compartio un post" %>
+          </div>
+          <div class="truncate text-white/60">
+            <%= message.post.caption.presence || "de #{message.post.user.username}" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <% if message.body.present? %>
-      <div class="text-sm leading-relaxed"><%= message.body %></div>
+      <div class="text-sm leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]"><%= message.body %></div>
     <% end %>
 
     <% if message.media.attached? %>

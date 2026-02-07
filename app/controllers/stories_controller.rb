@@ -16,6 +16,7 @@ class StoriesController < ApplicationController
   def show
     Story.cleanup_expired!
     @story = Story.active.includes(:user, media_attachment: :blob).find(params[:id])
+    @close_path = close_path_from_referer
     user = @story.user
 
     @stories_data = [
@@ -47,5 +48,13 @@ class StoriesController < ApplicationController
 
   def story_params
     params.require(:story).permit(:media, :description)
+  end
+
+  def close_path_from_referer
+    referer = request.referer.to_s
+    return root_path if referer.blank?
+    return referer if referer.start_with?(root_url)
+
+    root_path
   end
 end

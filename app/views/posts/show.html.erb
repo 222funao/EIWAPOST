@@ -9,7 +9,12 @@
 
           <div class="relative z-10 mx-auto flex h-full max-w-[1100px] items-center justify-center px-4">
             <div class="relative w-full max-h-[90vh] h-[90vh] overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/30 shadow-2xl lg:grid lg:grid-cols-[1.1fr_0.9fr]">
-              <%= link_to root_path,
+              <%= link_to @close_path,
+                data: {
+                  controller: "history-back",
+                  action: "click->history-back#go",
+                  history_back_fallback_value: @close_path
+                },
                 class: "absolute right-4 top-4 z-20 rounded-lg px-2 py-1 text-zinc-400 hover:bg-white/5 hover:text-white" do %>
                 ✕
               <% end %>
@@ -113,12 +118,15 @@
               <div class="flex h-full min-h-0 flex-col">
                 <div class="flex items-center justify-between border-b border-white/10 px-4 py-3">
                   <div class="flex items-center gap-3">
-                    <div class="h-9 w-9 overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
-                      <% if @post.user.avatar.attached? %>
-                        <%= image_tag @post.user.avatar, class: "h-full w-full object-cover" %>
-                      <% else %>
-                        <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
-                      <% end %>
+                    <div class="relative h-9 w-9">
+                      <div class="h-full w-full overflow-hidden rounded-full bg-zinc-800 ring-1 ring-white/10">
+                        <% if @post.user.avatar.attached? %>
+                          <%= image_tag @post.user.avatar, class: "h-full w-full object-cover" %>
+                        <% else %>
+                          <%= image_tag "avatars/default.png", class: "h-full w-full object-cover" %>
+                        <% end %>
+                      </div>
+                      <%= render "shared/presence_dot", user: @post.user %>
                     </div>
                     <div>
                       <div class="text-sm font-semibold">
@@ -146,9 +154,18 @@
                         </span>
                         <%= render_with_mentions(@post.caption) %>
                       <% end %>
+
+                      <% if @post.hashtag_names.any? %>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                          <% @post.hashtag_names.each do |tag| %>
+                            <%= link_to "##{tag}", trend_path(tag), class: "text-sm text-sky-400 hover:underline" %>
+                          <% end %>
+                        </div>
+                      <% end %>
                     </div>
                     <div class="flex items-center gap-3 shrink-0">
                       <%= render "posts/like_button", post: @post %>
+                      <%= render "posts/share_menu", post: @post %>
                     </div>
                   </div>
 

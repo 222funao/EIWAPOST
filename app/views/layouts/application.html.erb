@@ -17,8 +17,13 @@
 
 </head>
   <body class="min-h-screen w-full overflow-x-hidden <%= theme_class %>"
-        data-controller="user-search notifications-panel"
-        data-user-search-posts-url-value="<%= feed_path %>">
+        data-controller="<%= ["user-search", "notifications-panel", ("presence" if user_signed_in?)].compact.join(" ") %>"
+        data-user-search-posts-url-value="<%= feed_path %>"
+        <% if user_signed_in? %>
+        data-presence-user-id-value="<%= current_user.id %>"
+        data-presence-heartbeat-url-value="<%= presence_heartbeat_path %>"
+        data-presence-offline-url-value="<%= presence_offline_path %>"
+        <% end %>>
     <% if user_signed_in? %>
       <%= turbo_stream_from(*Notification.stream_for(current_user)) %>
     <% end %>

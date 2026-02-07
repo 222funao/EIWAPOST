@@ -29,6 +29,7 @@ export default class extends Controller {
     currentUserId: Number,
     startStoryId: Number,
     autoOpen: Boolean,
+    closeWithHistoryBack: Boolean,
     closeUrl: String,
     messagesPathTemplate: String,
     storyLikePathTemplate: String
@@ -72,6 +73,10 @@ export default class extends Controller {
     this._clearTimer()
     this._stopVideo()
     this._paused = false
+    if (this.closeWithHistoryBackValue && this._canGoBack()) {
+      window.history.back()
+      return
+    }
     if (this.hasCloseUrlValue && this.closeUrlValue) {
       window.location.href = this.closeUrlValue
       return
@@ -580,6 +585,18 @@ export default class extends Controller {
       if (story) return story
     }
     return null
+  }
+
+  _canGoBack() {
+    if (window.history.length <= 1) return false
+    if (!document.referrer) return false
+
+    try {
+      const referrerUrl = new URL(document.referrer)
+      return referrerUrl.origin === window.location.origin
+    } catch (_error) {
+      return false
+    }
   }
 }
 

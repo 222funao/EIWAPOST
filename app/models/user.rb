@@ -76,6 +76,10 @@ class User < ApplicationRecord
     private_unread || group_unread
   end
 
+  def online_visible?
+    PresenceTracker.online_visible?(self)
+  end
+
   private
 
   def set_default_avatar

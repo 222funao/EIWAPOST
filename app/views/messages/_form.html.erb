@@ -2,53 +2,61 @@
   url: form_url,
   method: :post,
   data: { controller: "message-form", action: "turbo:submit-end->message-form#reset", turbo: true, turbo_stream: true },
-  html: { multipart: true, class: "flex items-center gap-3" } do |f| %>
-
-  <div class="flex-1">
-    <%= f.text_area :body,
-      rows: 1,
-      placeholder: "Escribe un mensaje...",
-      class: "w-full h-10 resize-none overflow-hidden rounded-2xl border border-white/10 bg-white/5
-              px-4 py-2 text-sm leading-6 text-zinc-100 placeholder:text-zinc-500
-              outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
-  </div>
-
-  <div class="flex items-center gap-2 h-10">
-    <label
-      title="Adjuntar media"
-      class="grid h-10 w-10 cursor-pointer place-items-center rounded-full border border-sky-300/25 bg-gradient-to-br from-sky-500/20 to-cyan-400/10 text-lg text-sky-100 shadow-[0_6px_24px_rgba(14,165,233,0.25)] transition hover:scale-105 hover:from-sky-500/30 hover:to-cyan-400/20">
-      📎
-      <%= f.file_field :media,
-        multiple: true,
-        accept: "image/*,video/*",
-        data: { action: "change->message-form#filesChanged", message_form_target: "fileInput" },
-        class: "hidden" %>
-    </label>
-
-    <button
-      type="button"
-      title="Grabar audio"
-      aria-pressed="false"
-      data-action="click->message-form#toggleRecording"
-      data-message-form-target="recordButton"
-      class="grid h-10 w-10 place-items-center rounded-full border border-rose-500/20 bg-gradient-to-br from-rose-500/20 to-fuchsia-500/10 text-[10px] font-semibold uppercase tracking-wide text-rose-100 shadow-[0_6px_24px_rgba(244,63,94,0.25)] transition hover:scale-105 hover:from-rose-500/30 hover:to-fuchsia-500/20">
-      Rec
-    </button>
-
-    <%= f.submit "➤",
-      title: "Enviar mensaje",
-      class: "grid h-10 w-10 place-items-center rounded-full border border-emerald-300/25 bg-gradient-to-br from-emerald-500/25 to-teal-400/15 text-base font-semibold text-emerald-100 shadow-[0_6px_24px_rgba(16,185,129,0.25)] transition hover:scale-105 hover:from-emerald-500/35 hover:to-teal-400/25" %>
-  </div>
+  html: { multipart: true, class: "space-y-2" } do |f| %>
 
   <div
-    data-message-form-target="notice"
-    class="hidden rounded-full border border-emerald-300/25 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200">
-    0 archivos listos
+    data-message-form-target="previews"
+    class="hidden flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-2">
   </div>
 
-  <div
-    data-message-form-target="recordStatus"
-    class="hidden rounded-full border border-rose-500/20 bg-rose-500/10 px-3 py-1 text-xs text-rose-100">
-    Grabacion de audio lista
+  <div class="flex items-center gap-3">
+    <div class="flex-1">
+      <%= f.text_area :body,
+        rows: 1,
+        placeholder: "Escribe un mensaje...",
+        data: { action: "keydown->message-form#submitOnEnter paste->message-form#pasteImage" },
+        class: "w-full h-10 resize-none overflow-hidden rounded-2xl border border-white/10 bg-white/5
+                px-4 py-2 text-sm leading-6 text-zinc-100 placeholder:text-zinc-500
+                outline-none focus:border-white/20 focus:ring-2 focus:ring-white/10" %>
+    </div>
+
+    <div class="flex items-center gap-2 h-10">
+      <label
+        title="Adjuntar media"
+        class="grid h-10 w-10 cursor-pointer place-items-center rounded-full border border-sky-300/25 bg-gradient-to-br from-sky-500/20 to-cyan-400/10 text-lg text-sky-100 shadow-[0_6px_24px_rgba(14,165,233,0.25)] transition hover:scale-105 hover:from-sky-500/30 hover:to-cyan-400/20">
+        📎
+        <%= f.file_field :media,
+          multiple: true,
+          accept: "image/*,video/*",
+          data: { action: "change->message-form#filesChanged", message_form_target: "fileInput" },
+          class: "hidden" %>
+      </label>
+
+      <button
+        type="button"
+        title="Grabar audio"
+        aria-pressed="false"
+        data-action="click->message-form#toggleRecording"
+        data-message-form-target="recordButton"
+        class="grid h-10 w-10 place-items-center rounded-full border border-rose-500/20 bg-gradient-to-br from-rose-500/20 to-fuchsia-500/10 text-[10px] font-semibold uppercase tracking-wide text-rose-100 shadow-[0_6px_24px_rgba(244,63,94,0.25)] transition hover:scale-105 hover:from-rose-500/30 hover:to-fuchsia-500/20">
+        Rec
+      </button>
+
+      <%= f.submit "➤",
+        title: "Enviar mensaje",
+        class: "grid h-10 w-10 place-items-center rounded-full border border-emerald-300/25 bg-gradient-to-br from-emerald-500/25 to-teal-400/15 text-base font-semibold text-emerald-100 shadow-[0_6px_24px_rgba(16,185,129,0.25)] transition hover:scale-105 hover:from-emerald-500/35 hover:to-teal-400/25" %>
+    </div>
+
+    <div
+      data-message-form-target="notice"
+      class="hidden rounded-full border border-emerald-300/25 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 whitespace-nowrap">
+      0 archivos listos
+    </div>
+
+    <div
+      data-message-form-target="recordStatus"
+      class="hidden rounded-full border border-rose-500/20 bg-rose-500/10 px-3 py-1 text-xs text-rose-100 whitespace-nowrap">
+      Grabacion de audio lista
+    </div>
   </div>
 <% end %>

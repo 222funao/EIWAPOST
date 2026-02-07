@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_06_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_07_201000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -107,12 +107,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_06_140000) do
     t.bigint "conversation_id"
     t.datetime "created_at", null: false
     t.bigint "group_id"
+    t.bigint "post_id"
     t.datetime "read_at"
     t.bigint "sender_id", null: false
     t.bigint "story_id"
     t.datetime "updated_at", null: false
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["group_id"], name: "index_messages_on_group_id"
+    t.index ["post_id"], name: "index_messages_on_post_id"
     t.index ["read_at"], name: "index_messages_on_read_at"
     t.index ["sender_id"], name: "index_messages_on_sender_id"
     t.index ["story_id"], name: "index_messages_on_story_id"
@@ -135,10 +137,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_06_140000) do
     t.index ["recipient_id"], name: "index_notifications_on_recipient_id"
   end
 
+  create_table "post_trends", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "post_id", null: false
+    t.bigint "trend_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id", "trend_id"], name: "index_post_trends_on_post_id_and_trend_id", unique: true
+    t.index ["post_id"], name: "index_post_trends_on_post_id"
+    t.index ["trend_id"], name: "index_post_trends_on_trend_id"
+  end
+
   create_table "posts", force: :cascade do |t|
     t.text "caption"
     t.integer "comments_count", default: 0, null: false
     t.datetime "created_at", null: false
+    t.string "hashtags"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_posts_on_user_id"
@@ -306,6 +319,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_06_140000) do
     t.index ["user_id"], name: "index_story_likes_on_user_id"
   end
 
+  create_table "trends", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_trends_on_name", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "avatar"
     t.text "bio"
@@ -320,12 +340,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_06_140000) do
     t.string "feed_theme", default: "obsidian", null: false
     t.integer "followers_count", default: 0, null: false
     t.integer "following_count", default: 0, null: false
+    t.boolean "invisible", default: false, null: false
+    t.datetime "last_seen_at"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.datetime "updated_at", null: false
     t.string "username", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["last_seen_at"], name: "index_users_on_last_seen_at"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
   end
@@ -345,10 +368,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_06_140000) do
   add_foreign_key "likes", "users"
   add_foreign_key "messages", "conversations"
   add_foreign_key "messages", "groups"
+  add_foreign_key "messages", "posts", on_delete: :nullify
   add_foreign_key "messages", "stories"
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "notifications", "users", column: "actor_id"
   add_foreign_key "notifications", "users", column: "recipient_id"
+  add_foreign_key "post_trends", "posts"
+  add_foreign_key "post_trends", "trends"
   add_foreign_key "posts", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
