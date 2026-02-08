@@ -17,6 +17,22 @@ class Notification < ApplicationRecord
   def self.create_or_group!(action:, recipient:, actor:, notifiable: nil, data: {})
     return if recipient == actor
 
+    if action == "follow" && actor.present? && notifiable.blank?
+      existing_follow = where(
+        recipient: recipient,
+        actor: actor,
+        action: action,
+        notifiable_type: nil,
+        notifiable_id: nil
+      ).order(updated_at: :desc).first
+
+      if existing_follow
+        existing_follow.touch
+        existing_follow.broadcast_panel
+        return existing_follow
+      end
+    end
+
     if %w[like comment story_like].include?(action) && notifiable.present?
       existing = where(recipient: recipient, action: action, notifiable: notifiable)
                  .where("updated_at >= ?", GROUP_WINDOW.ago)
@@ -39,6 +55,24 @@ class Notification < ApplicationRecord
     )
     notification.broadcast_panel
     notification
+  rescue ActiveRecord::RecordNotUnique
+    # Handles concurrent requests when DB uniqueness wins the race.
+    if action == "follow" && actor.present? && notifiable.blank?
+      existing_follow = find_by(
+        recipient: recipient,
+        actor: actor,
+        action: action,
+        notifiable_type: nil,
+        notifiable_id: nil
+      )
+      if existing_follow
+        existing_follow.touch
+        existing_follow.broadcast_panel
+      end
+      return existing_follow
+    end
+
+    raise
   end
 
   def broadcast_panel

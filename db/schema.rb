@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_07_201000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_07_202003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -134,6 +134,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_07_201000) do
     t.index ["actor_id"], name: "index_notifications_on_actor_id"
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable_type_and_notifiable_id"
     t.index ["recipient_id", "action", "notifiable_type", "notifiable_id"], name: "index_notifications_grouping"
+    t.index ["recipient_id", "actor_id", "action"], name: "index_notifications_unique_follow", unique: true, where: "(((action)::text = 'follow'::text) AND (notifiable_type IS NULL) AND (notifiable_id IS NULL))"
     t.index ["recipient_id"], name: "index_notifications_on_recipient_id"
   end
 
